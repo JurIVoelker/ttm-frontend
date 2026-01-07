@@ -1,0 +1,26 @@
+import type { MetadataRoute } from "next";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "Tischtennis Manager",
+    short_name: "TT-Manager",
+    description:
+      "Eine App zum Verwalten der Mannschaften von Tischtennisvereinen",
+    start_url: "/",
+    display: "standalone",
+    background_color: "#ffffff",
+    theme_color: "#000000",
+    icons: [
+      {
+        src: "/icons/ttm-sm.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        src: "/icons/ttm-lg.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+  };
+}
