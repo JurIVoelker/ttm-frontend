@@ -8,7 +8,7 @@ import Refresher from "./refresher";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["200", "400", "700"],
+  weight: ["200", "400", "500", "600", "700"],
 });
 
 const Layout = ({ children }: { children?: React.ReactNode }) => {

@@ -137,15 +137,15 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 
-  --positive-dark: var(--positive-dark);
-  --positive-light: var(--positive-light);
-  --positive-border: var(--positive-border);
-  --negative-dark: var(--negative-dark);
-  --negative-light: var(--negative-light);
-  --negative-border: var(--negative-border);
-  --neutral-dark: var(--neutral-dark);
-  --neutral-light: var(--neutral-light);
-  --neutral-border: var(--neutral-border);
+  --color-positive-dark: var(--positive-dark);
+  --color-positive-light: var(--positive-light);
+  --color-positive-border: var(--positive-border);
+  --color-negative-dark: var(--negative-dark);
+  --color-negative-light: var(--negative-light);
+  --color-negative-border: var(--negative-border);
+  --color-neutral-dark: var(--neutral-dark);
+  --color-neutral-light: var(--neutral-light);
+  --color-neutral-border: var(--neutral-border);
 }
 
 @layer base {
@@ -191,9 +191,9 @@
   );
 }
 
-.bg-blurred-shadow {
-  box-shadow: 0 0px 24px 0
-    color-mix(in srgb, var(--background, #000) 40%, transparent);
+.blurred-shadow {
+  box-shadow: 0 0px 40px 0
+    color-mix(in srgb, var(--background, #000) 50%, transparent);
 }
 
 .animate-pop-in {

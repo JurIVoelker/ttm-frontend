@@ -1,10 +1,12 @@
 import Layout from "@/components/layout";
+import MatchList from "@/components/match-list";
 import PlayersCard from "@/components/players-card/players-card";
 import Title from "@/components/title";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFetchData } from "@/hooks/fetch-data";
 import { mainStore } from "@/store/main-store";
+import { MatchesDTO } from "@/types/match";
 import { PlayersOfTeamDTO } from "@/types/player";
 
 const TeamPage = () => {
@@ -18,6 +20,12 @@ const TeamPage = () => {
     ready: Boolean(teamSlug),
   });
 
+  const matchesResponse = useFetchData<MatchesDTO>({
+    method: "GET",
+    path: `/api/matches/${teamSlug}`,
+    ready: Boolean(teamSlug),
+  });
+
   return (
     <Layout>
       {playerResponse.loading ? (
@@ -26,6 +34,10 @@ const TeamPage = () => {
         <div className="space-y-6">
           <Title>{team?.name}</Title>
           <PlayersCard players={playerResponse.data.players} />
+          <MatchList
+            matches={matchesResponse.data || []}
+            allPlayers={playerResponse?.data?.players || []}
+          />
         </div>
       ) : (
         <>Nicht gefunden</>

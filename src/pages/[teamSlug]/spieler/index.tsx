@@ -142,7 +142,7 @@ const ManagePlayersPage = () => {
               />
             ))}
           </div>
-          <div className="fixed bottom-4 right-6 items-center gap-2 hidden md:flex p-2 bg-background rounded-md border bg-blurred-shadow">
+          <div className="fixed bottom-4 right-6 items-center gap-2 hidden md:flex p-2 bg-background rounded-md border blurred-shadow">
             <NavigationButtons
               onSaveSelection={onSaveSelection}
               isSaving={isSaving}
