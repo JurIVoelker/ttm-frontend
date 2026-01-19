@@ -123,7 +123,7 @@ const ManagePlayersPage = () => {
               isSaving={isSaving}
             />
           </div>
-          <div className="space-y-6 md:mt-6">
+          <div className="space-y-4 md:mt-6">
             <TeamPositionsCard
               players={targetTeamPositions}
               selectedPlayers={selectedPlayers}
