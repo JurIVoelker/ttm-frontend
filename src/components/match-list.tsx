@@ -140,7 +140,7 @@ const MatchCardHeader = ({
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <CardHeader>
         <CardTitle className="flex justify-between h-8 items-center">
-          {title}
+          <span>{title}</span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="icon-sm">

@@ -56,7 +56,7 @@ const PlayersCard = ({ players }: { players: PlayersOfTeamDTO[] }) => {
     <Card className="gap-4">
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
-          <span className="h-fit">Spieler</span>
+          <span className="h-fit text-lg">Spieler</span>
           {(leaderOfTeam || admin) && (
             <Link
               href={`/${teamSlug}/spieler`}
