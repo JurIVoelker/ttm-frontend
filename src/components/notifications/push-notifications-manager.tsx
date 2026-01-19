@@ -1,12 +1,15 @@
+import { showMessage } from "@/lib/message";
 import { urlBase64ToUint8Array } from "@/lib/push-notifications";
 import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import { sendRequest } from "@/lib/fetch-utils";
 
 export function PushNotificationManager() {
   const [isSupported, setIsSupported] = useState(false);
   const [subscription, setSubscription] = useState<PushSubscription | null>(
     null,
   );
-  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if ("serviceWorker" in navigator && "PushManager" in window) {
@@ -25,6 +28,7 @@ export function PushNotificationManager() {
   }
 
   async function subscribeToPush() {
+    setIsLoading(true);
     const registration = await navigator.serviceWorker.ready;
     const sub = await registration.pushManager.subscribe({
       userVisibleOnly: true,
@@ -33,22 +37,19 @@ export function PushNotificationManager() {
       ),
     });
     setSubscription(sub);
-    console.log({ sub });
-    // const serializedSub = JSON.parse(JSON.stringify(sub));
-    // await subscribeUser(serializedSub);
+    await sendRequest({
+      path: "/api/notifications/subscribe",
+      method: "POST",
+      body: sub.toJSON(),
+    });
+    setIsLoading(false);
+    showMessage("Benachrichtigungen wurden aktiviert.");
   }
 
   async function unsubscribeFromPush() {
     await subscription?.unsubscribe();
     setSubscription(null);
     // await unsubscribeUser();
-  }
-
-  async function sendTestNotification() {
-    if (subscription) {
-      // await sendNotification(message);
-      setMessage("");
-    }
   }
 
   if (!isSupported) {
@@ -61,19 +62,14 @@ export function PushNotificationManager() {
       {subscription ? (
         <>
           <p>You are subscribed to push notifications.</p>
-          <button onClick={unsubscribeFromPush}>Unsubscribe</button>
-          <input
-            type="text"
-            placeholder="Enter notification message"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-          />
-          <button onClick={sendTestNotification}>Send Test</button>
+          <Button onClick={unsubscribeFromPush}>Abbestellen</Button>
         </>
       ) : (
         <>
           <p>You are not subscribed to push notifications.</p>
-          <button onClick={subscribeToPush}>Subscribe</button>
+          <Button onClick={subscribeToPush} disabled={isLoading}>
+            Benachrichtigungen aktivieren
+          </Button>
         </>
       )}
     </div>
