@@ -62,7 +62,7 @@ interface MatchListProps {
 }
 
 const MatchList = ({ matches, allPlayers }: MatchListProps) => (
-  <div className="space-y-2 pb-6 md:grid md:grid-cols-2 lg:grid-cols-3">
+  <div className="space-y-4 pb-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 md:space-y-0">
     {matches.map((match) => (
       <MatchListItem key={match.id} match={match} allPlayers={allPlayers} />
     ))}
