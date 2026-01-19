@@ -17,6 +17,7 @@ export default function Document() {
   return (
     <Html lang="de">
       <Head>
+        <link rel="manifest" href="/manifest.json" />
         {process.env.NEXT_PUBLIC_UMAMI_ENV !== "prod" ? (
           <script
             defer

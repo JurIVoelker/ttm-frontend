@@ -6,6 +6,7 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
+  "id": "",
   "icons": [
     {
       "src": "/icons/ttm-sm.png",
