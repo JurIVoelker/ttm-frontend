@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Poppins } from "next/font/google";
-import AppSidebar from "./app-sidebar";
+import AppSidebar from "./sidebar/app-sidebar";
 import { SidebarProvider } from "./ui/sidebar";
 import Navbar from "./navbar";
 import Refresher from "./refresher";
