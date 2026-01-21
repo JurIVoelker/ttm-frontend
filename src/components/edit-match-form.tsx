@@ -102,12 +102,14 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
       return;
     }
     let res;
+    const date = new Date(data.date);
+    date.setHours(data.time.hour, data.time.minute, 0, 0);
     if (!isCreate) {
       res = await sendRequest({
         path: `/api/match/${teamSlug}/${match?.id}`,
         method: "PUT",
         body: {
-          time: new Date(data.date).toISOString(),
+          time: date.toISOString(),
           isHomeGame: data.isHomeGame,
           location: {
             hallName: data.hallName,
@@ -122,7 +124,7 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
         path: `/api/match/${teamSlug}`,
         method: "POST",
         body: {
-          time: new Date(data.date).toISOString(),
+          time: date.toISOString(),
           enemyName: data.enemyClubName,
           isHomeGame: data.isHomeGame,
           location: {
@@ -344,7 +346,7 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
           />
         </Card>
 
-        <div className="flex gap-2 w-full bottom-0 left-0 | bg-gradient-to-t from-background to-background/0 p-6 fixed | md:static md:p-0 | md:bg-transparent">
+        <div className="flex gap-2 w-full bottom-0 left-0 | bg-linear-to-t from-background to-background/0 p-6 fixed | md:static md:p-0 | md:bg-transparent">
           <Link
             className={cn(
               buttonVariants({ variant: "outline" }),

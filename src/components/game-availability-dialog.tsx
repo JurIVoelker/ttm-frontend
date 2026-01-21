@@ -30,7 +30,7 @@ const GameAvailabilityDialog = ({
         }}
         className={cn(
           buttonVariants({ variant: "outline" }),
-          "w-full justify-center",
+          "w-full justify-center text-sm",
         )}
         disabled={votes.length === 0}
       >

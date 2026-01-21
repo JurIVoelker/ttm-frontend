@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Button, buttonVariants } from "./ui/button";
-import { MoreHorizontal, XIcon } from "lucide-react";
+import { MoreHorizontal, PlusIcon, XIcon } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "./ui/badge";
 import {
@@ -61,13 +61,22 @@ interface MatchListProps {
   allPlayers: PlayersOfTeamDTO[];
 }
 
-const MatchList = ({ matches, allPlayers }: MatchListProps) => (
-  <div className="space-y-4 pb-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 md:space-y-0">
-    {matches.map((match) => (
-      <MatchListItem key={match.id} match={match} allPlayers={allPlayers} />
-    ))}
-  </div>
-);
+const MatchList = ({ matches, allPlayers }: MatchListProps) => {
+  const teamSlug = mainStore((state) => state.teamSlug);
+
+  return (
+    <div className="space-y-4 pb-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 md:space-y-0">
+      {matches.map((match) => (
+        <MatchListItem key={match.id} match={match} allPlayers={allPlayers} />
+      ))}
+      <Link href={`${teamSlug}/spiele/neu`} className="rounded-2xl">
+        <Card className="flex justify-center items-center hover:bg-secondary/70 h-full min-h-40">
+          <PlusIcon className="text-primary" />
+        </Card>
+      </Link>
+    </div>
+  );
+};
 
 const MatchListItem = ({
   match,
