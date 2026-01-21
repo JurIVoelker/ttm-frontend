@@ -346,7 +346,7 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
           />
         </Card>
 
-        <div className="flex gap-2 w-full bottom-0 left-0 | bg-linear-to-t from-background to-background/0 p-6 fixed | md:static md:p-0 | md:bg-transparent">
+        <div className="flex gap-2 w-full bottom-0 left-0 | bg-linear-to-t from-background to-background/0 p-6 fixed | md:static md:p-0 | md:bg-transparent z-10">
           <Link
             className={cn(
               buttonVariants({ variant: "outline" }),

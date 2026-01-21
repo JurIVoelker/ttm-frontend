@@ -19,7 +19,9 @@ const EditMatchPage = () => {
 
   return (
     <Layout>
-      <Title className="mb-6">Spiel gegen {data?.enemyName} bearbeiten</Title>
+      <Title className="mb-6">
+        Spiel gegen {data?.enemyName || "unbekannt"} bearbeiten
+      </Title>
       {!loading && data && <EditMatchForm match={data} />}
       {loading && <LoadingState />}
     </Layout>
@@ -27,7 +29,13 @@ const EditMatchPage = () => {
 };
 
 const LoadingState = () => {
-  return <Skeleton className="h-10 w-full rounded-md" />;
+  return (
+    <div className="space-y-4 z-1">
+      <Skeleton className="h-50 w-full" />
+      <Skeleton className="h-74 w-full" />
+      <Skeleton className="h-12 w-full" />
+    </div>
+  );
 };
 
 export default EditMatchPage;
