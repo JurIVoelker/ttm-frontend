@@ -17,8 +17,6 @@ const EditMatchPage = () => {
     ready: Boolean(teamSlug && matchId),
   });
 
-  console.log({ data });
-
   return (
     <Layout>
       <Title className="mb-6">Spiel gegen {data?.enemyName} bearbeiten</Title>
