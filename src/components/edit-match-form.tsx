@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Cancel01Icon, Tick01Icon } from "hugeicons-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { showMessage } from "@/lib/message";
 import { Card, CardContent, CardHeader } from "./ui/card";
@@ -11,7 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 import { Skeleton } from "./ui/skeleton";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Button } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { SingleMatchDTO } from "@/types/match";
 import TimeInput from "./ui/time-input";
@@ -38,7 +40,7 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
 }) => {
   const [isLoading, setLoading] = useState(true);
 
-  const { push, back } = useRouter();
+  const { push } = useRouter();
 
   const teamSlug = mainStore((state) => state.teamSlug);
 
@@ -343,14 +345,16 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
         </Card>
 
         <div className="flex gap-2 w-full bottom-0 left-0 | bg-gradient-to-t from-background to-background/0 p-6 fixed | md:static md:p-0 | md:bg-transparent">
-          <Button
-            onClick={() => back()}
-            variant="outline"
-            className="w-[calc(50%-0.25rem)]"
+          <Link
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "w-[calc(50%-0.25rem)]",
+            )}
+            href={`/${teamSlug}`}
           >
             <Cancel01Icon strokeWidth={2} />
             Abbrechen
-          </Button>
+          </Link>
           <Button type="submit" className="w-[calc(50%-0.25rem)]">
             <Tick01Icon strokeWidth={2} />
             Speichern
