@@ -10,3 +10,20 @@ export function urlBase64ToUint8Array(base64String: string) {
   }
   return outputArray;
 }
+
+export const getVapidUint8ArrayKey = () => {
+  if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
+    throw new Error("VAPID public key is not defined in environment variables");
+  }
+  return urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "");
+};
+
+export const registerServiceWorker = async () => {
+  if ("serviceWorker" in navigator) {
+    console.log("Registering SW...");
+    await navigator.serviceWorker.register("/sw.js").catch((error) => {
+      console.error("SW registration failed: ", error);
+    });
+    console.log("SW registered.");
+  }
+};
