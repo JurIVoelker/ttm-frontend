@@ -53,7 +53,7 @@ const LineupSelection = ({
               {availability === "AVAILABLE" && (
                 <Badge
                   variant="positive"
-                  className="ml-auto"
+                  className="ml-auto transition-none"
                   transparent={isSelected}
                 >
                   Hat Zeit
@@ -62,7 +62,7 @@ const LineupSelection = ({
               {availability === "UNAVAILABLE" && (
                 <Badge
                   variant="negative"
-                  className="ml-auto"
+                  className="ml-auto transition-none"
                   transparent={isSelected}
                 >
                   Keine Zeit
@@ -71,7 +71,7 @@ const LineupSelection = ({
               {availability === "UNKNOWN" && (
                 <Badge
                   variant="neutral"
-                  className="ml-auto"
+                  className="ml-auto transition-none"
                   transparent={isSelected}
                 >
                   Vielleicht
@@ -80,7 +80,7 @@ const LineupSelection = ({
               {availability === "NOT_RESPONDED" && (
                 <Badge
                   variant="outline"
-                  className="ml-auto"
+                  className="ml-auto transition-none"
                   transparent={isSelected}
                 >
                   Unbekannt
