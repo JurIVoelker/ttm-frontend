@@ -242,6 +242,9 @@ const LineupInfo = ({ match }: { match: MatchDTO }) => {
   const showSelectLineup = noLineup && isLeaderOfTeam();
   const showNoLineup = !showSelectLineup && noLineup;
 
+  const authStore = useAuthStore();
+  const playerId = authStore.authStore.jwtDecoded?.player?.id;
+
   return (
     <div>
       <h3 className="text-sm font-semibold">Aufstellung</h3>
@@ -267,7 +270,20 @@ const LineupInfo = ({ match }: { match: MatchDTO }) => {
           Keine Aufstellung vorhanden.
         </div>
       )}
-      {!noLineup && <>todo</>}
+      {!noLineup && (
+        <div className="space-y-2">
+          <div className="space-y-1">
+            {lineup.map((p, i) => (
+              <div className="flex items-center gap-1" key={p.id}>
+                <div className="size-6 bg-gray-500 flex items-center justify-center rounded-full">
+                  {i + 1}
+                </div>
+                <div>{p.id === playerId ? "Du" : p.fullName}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

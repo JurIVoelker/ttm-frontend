@@ -41,6 +41,8 @@ export type SingleMatchDTO = {
   time: Date;
   enemyName: string;
   isHomeGame: boolean;
+  lineup: Lineup[];
+  matchAvailabilityVotes: MatchAvailabilityVote[];
 };
 
 export type MatchDTO = MatchesDTO[number];

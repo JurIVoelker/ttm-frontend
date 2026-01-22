@@ -1,4 +1,5 @@
 import Layout from "@/components/layout";
+import NavigationButtons from "@/components/navigation-buttons";
 import Title from "@/components/title";
 import { Button } from "@/components/ui/button";
 import { useFetchData } from "@/hooks/fetch-data";
@@ -8,8 +9,8 @@ import { cn } from "@/lib/utils";
 import { mainStore } from "@/store/main-store";
 import { PlayersOfTeamDTO } from "@/types/player";
 import { TeamPositionsDTO } from "@/types/team";
-import { ArrowLeft01Icon, Tick01Icon } from "hugeicons-react";
-import { PlusIcon, SaveIcon } from "lucide-react";
+import { Tick01Icon } from "hugeicons-react";
+import { PlusIcon } from "lucide-react";
 import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
@@ -117,12 +118,7 @@ const ManagePlayersPage = () => {
             Mannschaften gemeldet sind. Wähle die Spieler aus, die in deiner
             Mannschaft spielen sollen.
           </p>
-          <div className="sticky top-22 flex items-center gap-2 z-10 py-4 pb-6 px-6 w-screen -translate-x-6 linear-background-bottom pointer-events-none md:hidden">
-            <NavigationButtons
-              onSaveSelection={onSaveSelection}
-              isSaving={isSaving}
-            />
-          </div>
+          <NavigationButtons onSave={onSaveSelection} isSaving={isSaving} />
           <div className="space-y-4 md:mt-6">
             <TeamPositionsCard
               players={targetTeamPositions}
@@ -142,48 +138,11 @@ const ManagePlayersPage = () => {
               />
             ))}
           </div>
-          <div className="fixed bottom-4 right-6 items-center gap-2 hidden md:flex p-2 bg-background rounded-md border blurred-shadow">
-            <NavigationButtons
-              onSaveSelection={onSaveSelection}
-              isSaving={isSaving}
-            />
-          </div>
         </div>
       ) : (
         <>Fehler beim Laden</>
       )}
     </Layout>
-  );
-};
-
-const NavigationButtons = ({
-  onSaveSelection,
-  isSaving,
-}: {
-  onSaveSelection: () => void;
-  isSaving: boolean;
-}) => {
-  const { back } = useRouter();
-
-  return (
-    <>
-      <Button
-        variant="outline"
-        onClick={() => back()}
-        className="pointer-events-auto"
-      >
-        <ArrowLeft01Icon strokeWidth={2} />
-        Zurück
-      </Button>
-      <Button
-        className="grow pointer-events-auto"
-        onClick={onSaveSelection}
-        disabled={isSaving}
-      >
-        <SaveIcon />
-        Speichern
-      </Button>
-    </>
   );
 };
 

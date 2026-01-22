@@ -3,9 +3,6 @@ import { z } from "zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Cancel01Icon, Tick01Icon } from "hugeicons-react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { showMessage } from "@/lib/message";
 import { Card, CardContent, CardHeader } from "./ui/card";
@@ -13,7 +10,6 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 import { Skeleton } from "./ui/skeleton";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Button, buttonVariants } from "./ui/button";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { SingleMatchDTO } from "@/types/match";
 import TimeInput from "./ui/time-input";
@@ -21,6 +17,7 @@ import { DatePicker } from "./ui/date-picker";
 import { Switch } from "./ui/switch";
 import { mainStore } from "@/store/main-store";
 import { sendRequest } from "@/lib/fetch-utils";
+import NavigationButtons from "./navigation-buttons";
 
 export type Time = {
   hour: number;
@@ -149,21 +146,93 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
 
   return (
     <Form {...form}>
-      <form className="space-y-6 pb-16" onSubmit={form.handleSubmit(onSubmit)}>
-        {isCreate && (
+      <form className="pb-16" onSubmit={form.handleSubmit(onSubmit)}>
+        <NavigationButtons onSave={() => {}} isSaving={isLoading} />
+        <div className="space-y-6">
+          {isCreate && (
+            <Card className="gap-4">
+              <CardHeader className="text-muted-foreground font-medium">
+                <h3>Name des Gegnerteams</h3>
+              </CardHeader>
+              <CardContent>
+                <FormField
+                  name="enemyClubName"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          placeholder="Gegner..."
+                          value={field.value}
+                          onChange={(event) => {
+                            field.onChange(event.target.value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+          )}
           <Card className="gap-4">
             <CardHeader className="text-muted-foreground font-medium">
-              <h3>Name des Gegnerteams</h3>
+              <h3>Datum und Uhrzeit</h3>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <FormField
-                name="enemyClubName"
+                name="date"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <DatePicker
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className={"w-full"}
+                        label="Spieldatum auswählen"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="time"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      {isLoading ? (
+                        <Skeleton className="h-10" />
+                      ) : (
+                        <TimeInput
+                          onChange={field.onChange}
+                          value={field.value as Time}
+                          label="Spieluhrzeit eingeben"
+                        />
+                      )}
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+          <Card className="gap-4">
+            <CardHeader className="text-muted-foreground font-medium">
+              <h3>Spielort</h3>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                name="hallName"
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
                       <Input
-                        placeholder="Gegner..."
+                        placeholder="Hallenname..."
                         value={field.value}
                         onChange={(event) => {
                           field.onChange(event.target.value);
@@ -174,193 +243,108 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
                   </FormItem>
                 )}
               />
+              <FormField
+                name="streetAddress"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        placeholder="Straße und Nummer..."
+                        value={field.value}
+                        onChange={(event) => {
+                          field.onChange(event.target.value);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                name="city"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        placeholder="Ort und PLZ..."
+                        value={field.value}
+                        onChange={(event) => {
+                          field.onChange(event.target.value);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="isHomeGame"
+                render={({ field }) => (
+                  <FormItem className="w-full space-y-4">
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={(value) =>
+                          field.onChange(value === locationOptions[0])
+                        }
+                        defaultValue={
+                          typeof field.value === "boolean"
+                            ? locationOptions[field.value ? 0 : 1]
+                            : undefined
+                        }
+                        className="flex gap-2"
+                      >
+                        {locationOptions?.map((option, id) => (
+                          <div
+                            key={`${id}-${option}`}
+                            className="w-full flex justify-center border-input has-data-[state=checked]:border-primary/50 relative gap-4 rounded-md border p-3 shadow-xs outline-none"
+                          >
+                            <div className="flex items-center gap-2">
+                              <RadioGroupItem
+                                id={`${id}-${option}`}
+                                value={option}
+                                className="after:absolute after:inset-0"
+                              />
+                              <Label htmlFor={`${id}-${option}`}>
+                                {option}
+                              </Label>
+                            </div>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </CardContent>
           </Card>
-        )}
-        <Card className="gap-4">
-          <CardHeader className="text-muted-foreground font-medium">
-            <h3>Datum und Uhrzeit</h3>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          <Card className="p-4 space-y-4">
             <FormField
-              name="date"
               control={form.control}
+              name="isCupMatch"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="w-full">
                   <FormControl>
-                    <DatePicker
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      className={"w-full"}
-                      label="Spieldatum auswählen"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="time"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    {isLoading ? (
-                      <Skeleton className="h-10" />
-                    ) : (
-                      <TimeInput
-                        onChange={field.onChange}
-                        value={field.value as Time}
-                        label="Spieluhrzeit eingeben"
+                    <div className="flex w-full justify-between items-center">
+                      <Label htmlFor="isCupMatch" className="p-gray">
+                        Pokalspiel
+                      </Label>
+                      <Switch
+                        id="isCupMatch"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
                       />
-                    )}
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </CardContent>
-        </Card>
-        <Card className="gap-4">
-          <CardHeader className="text-muted-foreground font-medium">
-            <h3>Spielort</h3>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <FormField
-              name="hallName"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      placeholder="Hallenname..."
-                      value={field.value}
-                      onChange={(event) => {
-                        field.onChange(event.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="streetAddress"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      placeholder="Straße und Nummer..."
-                      value={field.value}
-                      onChange={(event) => {
-                        field.onChange(event.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              name="city"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      placeholder="Ort und PLZ..."
-                      value={field.value}
-                      onChange={(event) => {
-                        field.onChange(event.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="isHomeGame"
-              render={({ field }) => (
-                <FormItem className="w-full space-y-4">
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={(value) =>
-                        field.onChange(value === locationOptions[0])
-                      }
-                      defaultValue={
-                        typeof field.value === "boolean"
-                          ? locationOptions[field.value ? 0 : 1]
-                          : undefined
-                      }
-                      className="flex gap-2"
-                    >
-                      {locationOptions?.map((option, id) => (
-                        <div
-                          key={`${id}-${option}`}
-                          className="w-full flex justify-center border-input has-data-[state=checked]:border-primary/50 relative gap-4 rounded-md border p-3 shadow-xs outline-none"
-                        >
-                          <div className="flex items-center gap-2">
-                            <RadioGroupItem
-                              id={`${id}-${option}`}
-                              value={option}
-                              className="after:absolute after:inset-0"
-                            />
-                            <Label htmlFor={`${id}-${option}`}>{option}</Label>
-                          </div>
-                        </div>
-                      ))}
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
-
-        <Card className="p-4 space-y-4">
-          <FormField
-            control={form.control}
-            name="isCupMatch"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormControl>
-                  <div className="flex w-full justify-between items-center">
-                    <Label htmlFor="isCupMatch" className="p-gray">
-                      Pokalspiel
-                    </Label>
-                    <Switch
-                      id="isCupMatch"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </Card>
-
-        <div className="flex gap-2 w-full bottom-0 left-0 | bg-linear-to-t from-background to-background/0 p-6 fixed | md:static md:p-0 | md:bg-transparent z-10">
-          <Link
-            className={cn(
-              buttonVariants({ variant: "outline" }),
-              "w-[calc(50%-0.25rem)]",
-            )}
-            href={`/${teamSlug}`}
-          >
-            <Cancel01Icon strokeWidth={2} />
-            Abbrechen
-          </Link>
-          <Button type="submit" className="w-[calc(50%-0.25rem)]">
-            <Tick01Icon strokeWidth={2} />
-            Speichern
-          </Button>
+          </Card>
         </div>
       </form>
     </Form>
