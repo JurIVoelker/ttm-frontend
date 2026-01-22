@@ -271,17 +271,23 @@ const LineupInfo = ({ match }: { match: MatchDTO }) => {
         </div>
       )}
       {!noLineup && (
-        <div className="space-y-2">
-          <div className="space-y-1">
-            {lineup.map((p, i) => (
-              <div className="flex items-center gap-1" key={p.id}>
-                <div className="size-6 bg-gray-500 flex items-center justify-center rounded-full">
-                  {i + 1}
-                </div>
-                <div>{p.id === playerId ? "Du" : p.fullName}</div>
+        <div className="space-y-1 mt-1.5">
+          {lineup.map((p, i) => (
+            <div className="flex items-center gap-1.5" key={p.id}>
+              <div
+                className={cn(
+                  "size-5 flex items-center justify-center rounded-full text-sm font-medium",
+                  p.id !== playerId && "bg-secondary text-secondary-foreground",
+                  p.id === playerId && "bg-primary text-primary-foreground",
+                )}
+              >
+                {i + 1}
               </div>
-            ))}
-          </div>
+              <div className="text-sm">
+                {p.id === playerId ? "Du" : p.fullName}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

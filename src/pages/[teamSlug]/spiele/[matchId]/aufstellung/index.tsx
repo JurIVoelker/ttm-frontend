@@ -69,7 +69,7 @@ const LineupPage = () => {
   return (
     <Layout>
       <Title className="mb-6">Aufstellung auswählen</Title>
-      <div className="text-sm text-muted-foreground max-w-150">
+      <div className="text-sm text-muted-foreground max-w-150 mb-4">
         Wähle die Spieler aus, wer bei diesem Spiel spielen soll. Anhand der
         Plaketten{" "}
         <Badge variant="positive" className="translate-y-0.5">
