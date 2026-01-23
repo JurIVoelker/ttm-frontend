@@ -225,3 +225,7 @@
     transform: rotate(0deg);
   }
 }
+
+body {
+  @apply max-h-screen overflow-hidden;
+}
