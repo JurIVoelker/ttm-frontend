@@ -151,7 +151,6 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
           onSave={() => {}}
           isSaving={isLoading}
           backNavigation={`/${teamSlug}#match-card-${match?.id}`}
-          className="-top-16"
         />
         <div className="space-y-6">
           {isCreate && (

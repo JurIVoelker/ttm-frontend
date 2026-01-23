@@ -19,7 +19,7 @@ const NavigationButtons = ({
     <>
       <div
         className={cn(
-          "sticky top-22 flex items-center gap-2 z-10 py-4 pb-6 px-6 w-screen -translate-x-6 linear-background-bottom pointer-events-none md:hidden",
+          "sticky -top-16 flex items-center gap-2 z-10 py-4 pb-6 px-6 w-screen -translate-x-6 linear-background-bottom pointer-events-none md:hidden",
           className,
         )}
       >
