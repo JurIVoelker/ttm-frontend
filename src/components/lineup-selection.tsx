@@ -2,18 +2,27 @@ import { cn } from "@/lib/utils";
 import { SingleMatchDTO } from "@/types/match";
 import { PlayersOfTeamDTO } from "@/types/player";
 import { Tick01Icon } from "hugeicons-react";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, XIcon } from "lucide-react";
 import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
 
 const LineupSelection = ({
   match,
   players,
   onSelectPlayer,
+  onRemovePlayer,
 }: {
   match?: SingleMatchDTO | null;
   players?: PlayersOfTeamDTO[];
   onSelectPlayer: (player: PlayersOfTeamDTO) => void;
+  onRemovePlayer: (player: PlayersOfTeamDTO) => void;
 }) => {
+  console.log({ lineupinside: match?.lineup });
+
+  const replacementPlayers = match?.lineup?.filter((lp) =>
+    players?.every((p) => p.id !== lp.id),
+  );
+
   return (
     <>
       <div className="text-sm space-y-1.5 mt-2">
@@ -89,6 +98,17 @@ const LineupSelection = ({
             </button>
           );
         })}
+        {replacementPlayers?.map((p) => (
+          <div key={p.id} className="flex gap-1.5">
+            <div className="bg-primary text-primary-foreground grow rounded-md flex items-center px-1.5 gap-1">
+              <Tick01Icon className="size-5 shrink-0" strokeWidth={2} />
+              {p.fullName} (Ersatz)
+            </div>
+            <Button size="icon" onClick={() => onRemovePlayer(p)}>
+              <XIcon />
+            </Button>
+          </div>
+        ))}
       </div>
     </>
   );

@@ -4,6 +4,7 @@ import Title from "@/components/title";
 import { useFetchData } from "@/hooks/fetch-data";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
+import { groupPlayersToOtherTeams } from "@/lib/team";
 import { cn } from "@/lib/utils";
 import { mainStore } from "@/store/main-store";
 import { PlayersOfTeamDTO } from "@/types/player";
@@ -57,35 +58,11 @@ const ManagePlayersPage = () => {
     (p) => p.position && p.position.teamIndex === currentTeam?.groupIndex,
   );
 
-  const otherTeamPositions: {
-    index: number;
-    teamName: string;
-    players: PlayersOfTeamDTO[];
-  }[] = [];
-
-  for (const position of targetTeamType?.players || []) {
-    if (!position.position || !currentTeam) continue;
-    if (position.position?.teamType !== currentTeam?.type) continue;
-    if (position.position?.teamIndex <= currentTeam?.groupIndex) continue;
-    const existingEntry = otherTeamPositions.find(
-      (pos) => pos.index === position.position?.teamIndex,
-    );
-    if (existingEntry) {
-      existingEntry.players.push(position);
-    } else {
-      const teamName =
-        teams.find(
-          (t) =>
-            t.type === position.position?.teamType &&
-            t.groupIndex === position.position?.teamIndex,
-        )?.name || `Team ${position.position?.teamIndex}`;
-      otherTeamPositions.push({
-        index: position.position?.teamIndex,
-        teamName,
-        players: [position],
-      });
-    }
-  }
+  const otherTeams = groupPlayersToOtherTeams({
+    currentTeam,
+    allPositions: teamPositionsResponse?.data?.teams || [],
+    teams: teams || [],
+  });
 
   const onSaveSelection = async () => {
     setIsSaving(true);
@@ -127,7 +104,7 @@ const ManagePlayersPage = () => {
               variant="highlighted"
               className="mt-1"
             />
-            {otherTeamPositions.map((otp) => (
+            {otherTeams.map((otp) => (
               <TeamPositionsCard
                 players={otp.players}
                 selectedPlayers={selectedPlayers}

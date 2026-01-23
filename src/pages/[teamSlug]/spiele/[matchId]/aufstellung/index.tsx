@@ -1,14 +1,17 @@
 import Layout from "@/components/layout";
 import LineupSelection from "@/components/lineup-selection";
 import NavigationButtons from "@/components/navigation-buttons";
+import ReplacementPlayerDrawer from "@/components/replacement-player-drawer";
 import Title from "@/components/title";
 import { Badge } from "@/components/ui/badge";
 import { useFetchData } from "@/hooks/fetch-data";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
+import { groupPlayersToOtherTeams } from "@/lib/team";
 import { mainStore } from "@/store/main-store";
 import { SingleMatchDTO } from "@/types/match";
 import { PlayersOfTeamDTO } from "@/types/player";
+import { TeamPositionsDTO } from "@/types/team";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -16,6 +19,7 @@ import { useState } from "react";
 const LineupPage = () => {
   const matchId = usePathname()?.split("/")?.[3];
   const teamSlug = mainStore((state) => state.teamSlug);
+  const teams = mainStore((state) => state.teams);
 
   const [loading, setLoading] = useState(false);
   const { push } = useRouter();
@@ -32,17 +36,47 @@ const LineupPage = () => {
     ready: Boolean(teamSlug),
   });
 
+  const teamPositions = useFetchData<{ teams: TeamPositionsDTO[] }>({
+    method: "GET",
+    path: `/api/teams/types/positions`,
+  });
+
+  const lineup = match.data?.lineup || [];
+
+  const otherTeams = groupPlayersToOtherTeams({
+    currentTeam: teams.find((t) => t.slug === teamSlug),
+    allPositions: teamPositions.data?.teams || [],
+    teams: teams || [],
+  });
+
+  console.log({ lineup: match.data });
+
+  const onSelectPlayerReplacementPlayers = (
+    selectedPlayers: PlayersOfTeamDTO[],
+  ) => {
+    console.log("selectedPlayers", selectedPlayers);
+
+    match.setData({
+      ...match.data,
+      lineup: [...(lineup || []), ...selectedPlayers],
+    } as SingleMatchDTO);
+  };
+
+  const onRemovePlayer = (player: PlayersOfTeamDTO) => {
+    match.setData({
+      ...match.data,
+      lineup: lineup?.filter((lp) => lp.id !== player.id) || [],
+    } as SingleMatchDTO);
+  };
+
   const onSelectPlayer = (player: PlayersOfTeamDTO) => {
-    const isSelected = match.data?.lineup?.some((lp) => lp.id === player.id);
+    const isSelected = lineup?.some((lp) => lp.id === player.id);
     if (isSelected) {
-      match.setData({
-        ...match.data,
-        lineup: match.data?.lineup.filter((lp) => lp.id !== player.id) || [],
-      } as SingleMatchDTO);
+      onRemovePlayer(player);
     } else {
       match.setData({
         ...match.data,
-        lineup: [...(match.data?.lineup || []), player],
+        lineup: [...(lineup || []), player],
       } as SingleMatchDTO);
     }
   };
@@ -62,7 +96,7 @@ const LineupPage = () => {
       return;
     }
 
-    showMessage("Fehler beim Speichern der Aufstellung.");
+    showMessage("Fehler beim Speichern der Aufstellung.", { variant: "error" });
     setLoading(false);
   };
 
@@ -70,7 +104,7 @@ const LineupPage = () => {
     <Layout>
       <Title className="mb-6">Aufstellung auswählen</Title>
       <div className="text-sm text-muted-foreground max-w-150 mb-4">
-        Wähle die Spieler aus, wer bei diesem Spiel spielen soll. Anhand der
+        Wähle die Spieler aus, die bei diesem Spiel spielen sollen. Anhand der
         Plaketten{" "}
         <Badge variant="positive" className="translate-y-0.5">
           Hat Zeit
@@ -83,15 +117,21 @@ const LineupPage = () => {
         <Badge variant="neutral" className="translate-y-0.5">
           Vielleicht
         </Badge>{" "}
-        oder kannst du sehen, ob die Spieler Zeit haben. Spieler mit der
-        Plakette <Badge variant="outline">Unbekannt</Badge> haben noch nicht
-        abgestimmt.
+        oder kannst du sehen, ob sie Zeit haben. Spieler mit der Plakette{" "}
+        <Badge variant="outline">Unbekannt</Badge> haben noch nicht abgestimmt.
       </div>
       <NavigationButtons onSave={onSave} isSaving={loading} className="mt-2" />
       <LineupSelection
         match={match.data}
         players={players.data?.players}
         onSelectPlayer={onSelectPlayer}
+        onRemovePlayer={onRemovePlayer}
+      />
+      <ReplacementPlayerDrawer
+        selectedPlayers={lineup}
+        teams={otherTeams}
+        onSelectPlayers={onSelectPlayerReplacementPlayers}
+        className="mt-6"
       />
     </Layout>
   );

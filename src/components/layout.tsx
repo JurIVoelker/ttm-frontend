@@ -18,7 +18,7 @@ const Layout = ({ children }: { children?: React.ReactNode }) => {
       <AppSidebar />
       <div className={cn(poppins.className, "w-full min-h-screen")}>
         <Navbar />
-        <div className="px-6 pb-6 pt-16 w-full h-[calc(100vh-88px)]">
+        <div className="px-6 pb-6 pt-16 w-full h-[calc(100vh-88px)] max-w-[100vw] overflow-x-scroll">
           {children}
         </div>
       </div>
