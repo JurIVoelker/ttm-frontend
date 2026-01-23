@@ -92,7 +92,7 @@ const MatchListItem = ({
   );
 
   return (
-    <Card>
+    <Card id={`match-card-${match.id}`} className="rounded-2xl">
       <MatchCardHeader
         title={match.enemyName}
         match={match}

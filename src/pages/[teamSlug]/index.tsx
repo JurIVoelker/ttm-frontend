@@ -8,6 +8,7 @@ import { useFetchData } from "@/hooks/fetch-data";
 import { mainStore } from "@/store/main-store";
 import { MatchesDTO } from "@/types/match";
 import { PlayersOfTeamDTO } from "@/types/player";
+import { useEffect } from "react";
 
 const TeamPage = () => {
   const teamSlug = mainStore((state) => state.teamSlug);
@@ -25,6 +26,16 @@ const TeamPage = () => {
     path: `/api/matches/${teamSlug}`,
     ready: Boolean(teamSlug),
   });
+
+  useEffect(() => {
+    const fragment = window.location.hash;
+    if (fragment) {
+      const element = document.querySelector(fragment);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [matchesResponse.loading]);
 
   return (
     <Layout>

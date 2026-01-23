@@ -140,14 +140,18 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
       });
     } else {
       showMessage(`Spiel erfolgreich ${isCreate ? "erstellt" : "bearbeitet"}`);
-      push(`/${teamSlug}`);
+      push(`/${teamSlug}${isCreate ? "" : `#match-card-${match?.id}`}`);
     }
   };
 
   return (
     <Form {...form}>
       <form className="pb-16" onSubmit={form.handleSubmit(onSubmit)}>
-        <NavigationButtons onSave={() => {}} isSaving={isLoading} />
+        <NavigationButtons
+          onSave={() => {}}
+          isSaving={isLoading}
+          backNavigation={`/${teamSlug}#match-card-${match?.id}`}
+        />
         <div className="space-y-6">
           {isCreate && (
             <Card className="gap-4">

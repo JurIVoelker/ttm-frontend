@@ -91,7 +91,7 @@ const LineupPage = () => {
 
     if (res.ok) {
       showMessage("Die Aufstellung wurde erfolgreich gespeichert.");
-      push(`/${teamSlug}`);
+      push(`/${teamSlug}#match-card-${matchId}`);
       setLoading(false);
       return;
     }
@@ -120,7 +120,12 @@ const LineupPage = () => {
         oder kannst du sehen, ob sie Zeit haben. Spieler mit der Plakette{" "}
         <Badge variant="outline">Unbekannt</Badge> haben noch nicht abgestimmt.
       </div>
-      <NavigationButtons onSave={onSave} isSaving={loading} className="mt-2" />
+      <NavigationButtons
+        onSave={onSave}
+        isSaving={loading}
+        className="mt-2"
+        backNavigation={`/${teamSlug}#match-card-${matchId}`}
+      />
       <LineupSelection
         match={match.data}
         players={players.data?.players}

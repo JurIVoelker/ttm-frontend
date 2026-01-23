@@ -8,10 +8,12 @@ const NavigationButtons = ({
   onSave,
   isSaving,
   className,
+  backNavigation,
 }: {
   onSave: () => void;
   isSaving: boolean;
   className?: string;
+  backNavigation?: string;
 }) => {
   return (
     <>
@@ -21,10 +23,18 @@ const NavigationButtons = ({
           className,
         )}
       >
-        <Buttons onSave={onSave} isSaving={isSaving} />
+        <Buttons
+          onSave={onSave}
+          isSaving={isSaving}
+          backNavigation={backNavigation}
+        />
       </div>
       <div className="fixed bottom-4 right-6 items-center gap-2 hidden md:flex p-2 bg-background rounded-md border blurred-shadow">
-        <Buttons onSave={onSave} isSaving={isSaving} />
+        <Buttons
+          onSave={onSave}
+          isSaving={isSaving}
+          backNavigation={backNavigation}
+        />
       </div>
     </>
   );
@@ -33,17 +43,19 @@ const NavigationButtons = ({
 const Buttons = ({
   onSave,
   isSaving,
+  backNavigation,
 }: {
   onSave: () => void;
   isSaving: boolean;
+  backNavigation?: string;
 }) => {
-  const { back } = useRouter();
+  const { back, push } = useRouter();
 
   return (
     <>
       <Button
         variant="outline"
-        onClick={() => back()}
+        onClick={() => (backNavigation ? push(backNavigation) : back())}
         className="pointer-events-auto"
         type="button"
       >
