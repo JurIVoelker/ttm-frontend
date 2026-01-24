@@ -29,9 +29,10 @@ export const sendRequest = async ({
   method,
   body,
   options,
-}: RequestParams) => {
+}: RequestParams): Promise<Response> => {
   let jwt = authStore.getState().jwt || "";
   const jwtPayload = decode(jwt) as jwtPayload;
+  let renewResponse: Response | null = null;
 
   const shouldRenewJwt = options?.renewJwt ?? true;
   const hideMessages = options?.hideMessages ?? false;
@@ -44,28 +45,40 @@ export const sendRequest = async ({
     console.log(
       `JWT expired since ${formatDistanceStrict(new Date(jwtPayload.exp * 1000), new Date())}, renewing...`,
     );
-    jwt = await renewJwt();
+    try {
+      const { jwt: newJwt, response } = await renewJwt();
+      jwt = newJwt;
+      renewResponse = response;
+    } catch (error) {
+      console.error("Error renewing JWT:", error);
+    }
   }
 
   if (!jwt) {
-    throw new Error(COULD_NOT_RENEW_JWT);
+    return renewResponse || new Response(JSON.stringify({ message: COULD_NOT_RENEW_JWT }), { status: 401 });
   }
 
   console.log(`-> [${method}] ${path}`);
-  const response = await fetch(API_URL + path, {
-    method,
-    body: body ? JSON.stringify(body) : undefined,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: jwt ? `Bearer ${jwt}` : "",
-      ...options?.headers,
-    },
-    credentials: "include",
-  });
+  let response: Response;
+  try {
+    response = await fetch(API_URL + path, {
+      method,
+      body: body ? JSON.stringify(body) : undefined,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: jwt ? `Bearer ${jwt}` : "",
+        ...options?.headers,
+      },
+      credentials: "include",
+    });
+  } catch (error) {
+    console.error(`Error during fetch to ${path}:`, error);
+    throw error;
+  }
 
   console.log(`<- [${method}] ${path} - Status ${response.status}`);
 
-  if (hideMessages) return response
+  if (hideMessages) return response;
 
   if (response.status === 403) {
     showMessage("Du hast keine Berechtigung, diese Aktion durchzuführen.", {
@@ -75,6 +88,11 @@ export const sendRequest = async ({
     showMessage("Authentifizierung fehlgeschlagen. Bitte versuche es erneut.", {
       variant: "error",
     });
+  } else if (response.status === 429) {
+    showMessage(
+      "Zu viele Anfragen in kurzer Zeit. Bitte warte einen Moment und versuche es erneut.",
+      { variant: "error" },
+    );
   } else if (!response.ok) {
     showMessage(
       `Ein unbekannter Fehler ist aufgetreten (${response.status}). Bitte versuche es erneut.`,
@@ -89,7 +107,10 @@ export const renewJwt = async () => {
   const jwt = authStore.getState().jwt;
   const inviteToken = authStore.getState().inviteToken;
 
-  if (!jwt) throw new Error(JWT_MISSING_ERROR);
+  if (!jwt) {
+    console.error(JWT_MISSING_ERROR);
+    return { jwt: "", response: new Response(JSON.stringify({ message: JWT_MISSING_ERROR }), { status: 401 }) };
+  }
 
   const { roles, player } = decode(jwt || "") as jwtPayload;
 
@@ -100,11 +121,14 @@ export const renewJwt = async () => {
       options: { renewJwt: false },
     });
 
-    if (!response.ok) throw new Error(ADMIN_LEADER_REFRESH_ERROR);
+    if (!response.ok) {
+      console.error(ADMIN_LEADER_REFRESH_ERROR);
+      return { jwt: "", response: new Response(JSON.stringify({ message: ADMIN_LEADER_REFRESH_ERROR }), { status: response.status }) };
+    }
     const data = await response.json();
 
     authStore.getState().setJwt(data.jwt);
-    return data.jwt as string;
+    return { jwt: data.jwt as string, response };
   }
 
   if (!roles.includes("player") || !inviteToken || !player?.id) {
@@ -124,7 +148,7 @@ export const renewJwt = async () => {
 
   authStore.getState().setJwt(data.jwt);
 
-  return data.jwt as string;
+  return { jwt: data.jwt as string, response };
 };
 
 export const fetchPlayersWithInviteToken = async (

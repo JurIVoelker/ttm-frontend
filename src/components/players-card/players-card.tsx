@@ -47,6 +47,7 @@ const PlayersCard = ({ players }: { players: PlayersOfTeamDTO[] }) => {
       const inviteLink = `${window.location.origin}/${teamSlug}/login?inviteToken=${inviteToken}`;
       navigator.clipboard.writeText(inviteLink);
       showMessage("Einladungslink kopiert");
+      authStore.setInviteToken(inviteToken);
     }
   };
 
