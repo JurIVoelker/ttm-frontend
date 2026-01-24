@@ -55,6 +55,7 @@ import { useRouter } from "next/router";
 import { mainStore } from "@/store/main-store";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { sendRequest } from "@/lib/fetch-utils";
 
 interface MatchListProps {
   matches: MatchesDTO;
@@ -108,6 +109,7 @@ const MatchListItem = ({
         defaultValue={playersVote?.availability}
         votes={match.matchAvailabilityVotes}
         allPlayers={allPlayers}
+        matchId={match.id}
       />
     </Card>
   );
@@ -302,10 +304,12 @@ const MatchAvailability = ({
   defaultValue,
   allPlayers,
   votes,
+  matchId,
 }: {
   defaultValue?: Availability;
   votes: MatchAvailabilityVote[];
   allPlayers: PlayersOfTeamDTO[];
+  matchId: string;
 }) => {
   const [availability, setAvailability] = useState<Availability>(
     defaultValue || "NOT_RESPONDED",
@@ -321,8 +325,23 @@ const MatchAvailability = ({
 
   if (hideContent) return null;
 
-  const onVote = (availability: Availability) => {
-    setAvailability(availability);
+  const onVote = async (availabilityVote: Availability) => {
+    const prevVal = availability;
+    setAvailability(availabilityVote);
+    if (prevVal === availabilityVote) return;
+
+    const response = await sendRequest({
+      method: "POST",
+      path: `/api/match/${mainStore.getState().teamSlug}/vote/${matchId}`,
+      body: { availability: availabilityVote },
+    });
+
+    if (!response.ok) {
+      setAvailability(prevVal);
+      if (response.status === 401) {
+        console.log("handle not logged in");
+      }
+    }
   };
 
   return (
@@ -333,7 +352,7 @@ const MatchAvailability = ({
           : "Hast du Zeit zu spielen?"}
       </h3>
       {isPlayerOfTeam() && (
-        <div className="flex gap-2">
+        <div className="flex gap-2 mb-2">
           <Button
             className="grow"
             variant={availability === "AVAILABLE" ? "positive" : "outline"}
