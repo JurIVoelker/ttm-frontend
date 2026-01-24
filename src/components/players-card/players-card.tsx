@@ -20,10 +20,12 @@ import { mainStore } from "@/store/main-store";
 import Link from "next/link";
 import { useFetchData } from "@/hooks/fetch-data";
 import { showMessage } from "@/lib/message";
+import { useRouter } from "next/router";
 
 const PlayersCard = ({ players }: { players: PlayersOfTeamDTO[] }) => {
   const { authStore } = useAuthStore();
   const { teamSlug } = mainStore((state) => state);
+  const { push } = useRouter();
 
   // Permissions
   const leaderOfTeam = isLeaderOfTeam();
@@ -97,7 +99,14 @@ const PlayersCard = ({ players }: { players: PlayersOfTeamDTO[] }) => {
             </Button>
           )}
           {!playerOfTeam && leaderOfTeam && (
-            <Button className="w-full" variant="secondary">
+            <Button
+              className="w-full"
+              variant="secondary"
+              onClick={() =>
+                push(`${teamSlug}/login?inviteToken=${inviteToken}`)
+              }
+              disabled={!inviteToken || !teamSlug}
+            >
               <Login02Icon strokeWidth={2} />
               Mannschaft beitreten
             </Button>

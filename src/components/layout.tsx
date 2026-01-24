@@ -11,13 +11,19 @@ const poppins = Poppins({
   weight: ["200", "400", "500", "600", "700"],
 });
 
-const Layout = ({ children }: { children?: React.ReactNode }) => {
+const Layout = ({
+  children,
+  hideSidebar,
+}: {
+  children?: React.ReactNode;
+  hideSidebar?: boolean;
+}) => {
   return (
     <SidebarProvider>
       <Refresher />
-      <AppSidebar />
+      {!hideSidebar && <AppSidebar />}
       <div className={cn(poppins.className, "w-full min-h-screen")}>
-        <Navbar />
+        <Navbar menuHidden={hideSidebar} />
         <div className="px-6 pb-6 pt-16 w-full h-[calc(100vh-88px)] max-w-[100vw] overflow-x-scroll overflow-y-auto">
           {children}
         </div>

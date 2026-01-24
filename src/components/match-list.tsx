@@ -69,11 +69,13 @@ const MatchList = ({ matches, allPlayers }: MatchListProps) => {
       {matches.map((match) => (
         <MatchListItem key={match.id} match={match} allPlayers={allPlayers} />
       ))}
-      <Link href={`${teamSlug}/spiele/neu`} className="rounded-2xl">
-        <Card className="flex justify-center items-center hover:bg-secondary/70 h-full min-h-40">
-          <PlusIcon className="text-primary" />
-        </Card>
-      </Link>
+      {isLeaderOfTeam() && (
+        <Link href={`${teamSlug}/spiele/neu`} className="rounded-2xl">
+          <Card className="flex justify-center items-center hover:bg-secondary/70 h-full min-h-40">
+            <PlusIcon className="text-primary" />
+          </Card>
+        </Link>
+      )}
     </div>
   );
 };
@@ -150,38 +152,40 @@ const MatchCardHeader = ({
       <CardHeader>
         <CardTitle className="flex justify-between h-8 items-center">
           <span>{title}</span>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="icon-sm">
-                <MoreHorizontal />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-60 p-2">
-              <DropdownMenuItem
-                onClick={onCopy}
-                disabled={match.lineup.length === 0}
-              >
-                <Copy01Icon strokeWidth={2} />
-                Infotext kopieren
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onEditMatch}>
-                <PencilEdit02Icon strokeWidth={2} />
-                Spieldaten anpassen
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onEditLineup}>
-                <LeftToRightListNumberIcon strokeWidth={2} />
-                Aufstellung bearbeiten
-              </DropdownMenuItem>
-              <Separator className="my-1" />
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setIsOpen(true)}
-              >
-                <XIcon strokeWidth={2} />
-                Spiel löschen
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {isLeaderOfTeam() && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon-sm">
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-60 p-2">
+                <DropdownMenuItem
+                  onClick={onCopy}
+                  disabled={match.lineup.length === 0}
+                >
+                  <Copy01Icon strokeWidth={2} />
+                  Infotext kopieren
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onEditMatch}>
+                  <PencilEdit02Icon strokeWidth={2} />
+                  Spieldaten anpassen
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onEditLineup}>
+                  <LeftToRightListNumberIcon strokeWidth={2} />
+                  Aufstellung bearbeiten
+                </DropdownMenuItem>
+                <Separator className="my-1" />
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => setIsOpen(true)}
+                >
+                  <XIcon strokeWidth={2} />
+                  Spiel löschen
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </CardTitle>
       </CardHeader>
       <AlertDialogContent>

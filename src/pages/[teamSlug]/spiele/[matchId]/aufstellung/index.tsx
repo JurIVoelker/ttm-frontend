@@ -92,11 +92,7 @@ const LineupPage = () => {
     if (res.ok) {
       showMessage("Die Aufstellung wurde erfolgreich gespeichert.");
       push(`/${teamSlug}#match-card-${matchId}`);
-      setLoading(false);
-      return;
     }
-
-    showMessage("Fehler beim Speichern der Aufstellung.", { variant: "error" });
     setLoading(false);
   };
 

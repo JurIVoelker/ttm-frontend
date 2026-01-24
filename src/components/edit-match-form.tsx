@@ -133,12 +133,7 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
         },
       });
     }
-    if (!res.ok) {
-      // umami()?.track(`error:${isCreate ? "create-match" : "edit-match"}`);
-      showMessage("Ein Fehler ist aufgetreten.", {
-        variant: "error",
-      });
-    } else {
+    if (res.ok) {
       showMessage(`Spiel erfolgreich ${isCreate ? "erstellt" : "bearbeitet"}`);
       push(`/${teamSlug}${isCreate ? "" : `#match-card-${match?.id}`}`);
     }
