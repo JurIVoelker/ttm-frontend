@@ -54,7 +54,7 @@ const Buttons = ({
   return (
     <>
       <Button
-        variant="outline"
+        variant="secondary"
         onClick={() => (backNavigation ? push(backNavigation) : back())}
         className="pointer-events-auto"
         type="button"

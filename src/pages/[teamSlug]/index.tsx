@@ -32,7 +32,7 @@ const TeamPage = () => {
     if (fragment) {
       const element = document.querySelector(fragment);
       if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     }
   }, [matchesResponse.loading]);
