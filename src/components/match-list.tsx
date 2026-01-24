@@ -56,6 +56,7 @@ import { mainStore } from "@/store/main-store";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { sendRequest } from "@/lib/fetch-utils";
+import { authStore } from "@/store/auth-store";
 
 interface MatchListProps {
   matches: MatchesDTO;
@@ -317,6 +318,8 @@ const MatchAvailability = ({
   const leaderButNotPlayer = isLeader() && !isPlayerOfTeam();
   const hideContent = !isPlayerOfTeam() && !isAdmin() && !isLeader();
 
+  const { push } = useRouter();
+
   useEffect(() => {
     if (defaultValue) {
       setAvailability(defaultValue);
@@ -338,6 +341,20 @@ const MatchAvailability = ({
 
     if (!response.ok) {
       setAvailability(prevVal);
+      if (response.status === 403) {
+        if (authStore.getState().inviteToken) {
+          showMessage(
+            "Es ist ein Fehler aufgetreten. Bitte melde dich erneut an.",
+            { variant: "error" },
+          );
+          push(
+            `/${mainStore.getState().teamSlug}/login?inviteToken=${authStore.getState().inviteToken}`,
+          );
+        } else {
+          showMessage("Es ist ein Fehler aufgetreten.", { variant: "error" });
+          // TODO logout user and show message
+        }
+      }
       if (response.status === 401) {
         console.log("handle not logged in");
       }
