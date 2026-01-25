@@ -103,7 +103,7 @@ export const sendRequest = async ({
   return response;
 };
 
-export const renewJwt = async () => {
+export const renewJwt = async (options: { excludePlayer?: boolean } = {}) => {
   const jwt = authStore.getState().jwt;
   const inviteToken = authStore.getState().inviteToken;
 
@@ -116,7 +116,7 @@ export const renewJwt = async () => {
 
   if (roles.includes("admin") || roles.includes("leader")) {
     const response = await sendRequest({
-      path: "/api/auth/refresh",
+      path: "/api/auth/refresh" + (options.excludePlayer ? "?excludePlayer=true" : ""),
       method: "POST",
       options: { renewJwt: false },
     });

@@ -47,7 +47,6 @@ const TeamPage = () => {
           (vote) => vote.playerId === playerId && vote.matchId === matchId,
         );
         if (vote) {
-          console.log("updating vote");
           vote.availability = availability;
         }
         return match;

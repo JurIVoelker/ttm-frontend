@@ -7,7 +7,12 @@ import {
   CardTitle,
 } from "../ui/card";
 import useAuthStore from "@/hooks/use-auth-store";
-import { isAdmin, isLeaderOfTeam, isPlayerOfTeam } from "@/lib/permission";
+import {
+  isAdmin,
+  isLeader,
+  isLeaderOfTeam,
+  isPlayerOfTeam,
+} from "@/lib/permission";
 import { Button, buttonVariants } from "../ui/button";
 import {
   Copy01Icon,
@@ -21,6 +26,7 @@ import Link from "next/link";
 import { useFetchData } from "@/hooks/fetch-data";
 import { showMessage } from "@/lib/message";
 import { useRouter } from "next/router";
+import { renewJwt } from "@/lib/fetch-utils";
 
 const PlayersCard = ({ players }: { players: PlayersOfTeamDTO[] }) => {
   const { authStore } = useAuthStore();
@@ -48,6 +54,15 @@ const PlayersCard = ({ players }: { players: PlayersOfTeamDTO[] }) => {
       navigator.clipboard.writeText(inviteLink);
       showMessage("Einladungslink kopiert");
       authStore.setInviteToken(inviteToken);
+    }
+  };
+
+  const onLeaveTeam = async () => {
+    if (isAdmin() || isLeader()) {
+      await renewJwt({ excludePlayer: true });
+      showMessage("Mannschaft erfolgreich verlassen.");
+    } else {
+      authStore.setJwt(null);
     }
   };
 
@@ -94,7 +109,11 @@ const PlayersCard = ({ players }: { players: PlayersOfTeamDTO[] }) => {
             </Button>
           )}
           {playerOfTeam && (
-            <Button className="w-full" variant="secondary">
+            <Button
+              className="w-full"
+              variant="secondary"
+              onClick={onLeaveTeam}
+            >
               <Logout02Icon strokeWidth={2} />
               Mannschaft verlassen
             </Button>
