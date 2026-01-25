@@ -63,13 +63,24 @@ interface MatchListProps {
   allPlayers: PlayersOfTeamDTO[];
 }
 
-const MatchList = ({ matches, allPlayers }: MatchListProps) => {
+const MatchList = ({
+  matches,
+  allPlayers,
+  saveVote,
+}: MatchListProps & {
+  saveVote: (availability: Availability, matchId: string) => Promise<void>;
+}) => {
   const teamSlug = mainStore((state) => state.teamSlug);
 
   return (
     <div className="space-y-4 pb-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 md:space-y-0">
       {matches.map((match) => (
-        <MatchListItem key={match.id} match={match} allPlayers={allPlayers} />
+        <MatchListItem
+          key={match.id}
+          match={match}
+          allPlayers={allPlayers}
+          saveVote={(availability) => saveVote(availability, match.id)}
+        />
       ))}
       {isLeaderOfTeam() && (
         <Link href={`${teamSlug}/spiele/neu`} className="rounded-2xl">
@@ -85,9 +96,11 @@ const MatchList = ({ matches, allPlayers }: MatchListProps) => {
 const MatchListItem = ({
   match,
   allPlayers,
+  saveVote,
 }: {
   match: MatchDTO;
   allPlayers: PlayersOfTeamDTO[];
+  saveVote: (availability: Availability, matchId: string) => Promise<void>;
 }) => {
   const { authStore } = useAuthStore();
 
@@ -111,6 +124,7 @@ const MatchListItem = ({
         votes={match.matchAvailabilityVotes}
         allPlayers={allPlayers}
         matchId={match.id}
+        saveVote={(availability) => saveVote(availability, match.id)}
       />
     </Card>
   );
@@ -306,11 +320,13 @@ const MatchAvailability = ({
   allPlayers,
   votes,
   matchId,
+  saveVote,
 }: {
   defaultValue?: Availability;
   votes: MatchAvailabilityVote[];
   allPlayers: PlayersOfTeamDTO[];
   matchId: string;
+  saveVote: (availability: Availability) => Promise<void>;
 }) => {
   const [availability, setAvailability] = useState<Availability>(
     defaultValue || "NOT_RESPONDED",
@@ -330,8 +346,9 @@ const MatchAvailability = ({
 
   const onVote = async (availabilityVote: Availability) => {
     const prevVal = availability;
-    setAvailability(availabilityVote);
     if (prevVal === availabilityVote) return;
+    setAvailability(availabilityVote);
+    saveVote(availabilityVote);
 
     const response = await sendRequest({
       method: "POST",

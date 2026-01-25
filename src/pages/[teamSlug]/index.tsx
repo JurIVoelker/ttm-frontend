@@ -5,8 +5,9 @@ import Title from "@/components/title";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFetchData } from "@/hooks/fetch-data";
+import { authStore } from "@/store/auth-store";
 import { mainStore } from "@/store/main-store";
-import { MatchesDTO } from "@/types/match";
+import { Availability, MatchesDTO } from "@/types/match";
 import { PlayersOfTeamDTO } from "@/types/player";
 import { useEffect } from "react";
 
@@ -37,6 +38,23 @@ const TeamPage = () => {
     }
   }, [matchesResponse.loading]);
 
+  const onSaveVote = async (availability: Availability, matchId: string) => {
+    const playerId = authStore.getState().jwtDecoded?.player?.id;
+    if (!playerId) return;
+    matchesResponse.setData(
+      matchesResponse?.data?.map((match) => {
+        const vote = match.matchAvailabilityVotes.find(
+          (vote) => vote.playerId === playerId && vote.matchId === matchId,
+        );
+        if (vote) {
+          console.log("updating vote");
+          vote.availability = availability;
+        }
+        return match;
+      }) || [],
+    );
+  };
+
   return (
     <Layout>
       {playerResponse.loading ? (
@@ -48,6 +66,7 @@ const TeamPage = () => {
           <MatchList
             matches={matchesResponse.data || []}
             allPlayers={playerResponse?.data?.players || []}
+            saveVote={onSaveVote}
           />
         </div>
       ) : (
