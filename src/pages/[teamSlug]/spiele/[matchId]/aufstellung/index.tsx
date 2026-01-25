@@ -49,13 +49,9 @@ const LineupPage = () => {
     teams: teams || [],
   });
 
-  console.log({ lineup: match.data });
-
   const onSelectPlayerReplacementPlayers = (
     selectedPlayers: PlayersOfTeamDTO[],
   ) => {
-    console.log("selectedPlayers", selectedPlayers);
-
     match.setData({
       ...match.data,
       lineup: [...(lineup || []), ...selectedPlayers],

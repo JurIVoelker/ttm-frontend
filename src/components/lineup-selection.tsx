@@ -17,8 +17,6 @@ const LineupSelection = ({
   onSelectPlayer: (player: PlayersOfTeamDTO) => void;
   onRemovePlayer: (player: PlayersOfTeamDTO) => void;
 }) => {
-  console.log({ lineupinside: match?.lineup });
-
   const replacementPlayers = match?.lineup?.filter((lp) =>
     players?.every((p) => p.id !== lp.id),
   );
