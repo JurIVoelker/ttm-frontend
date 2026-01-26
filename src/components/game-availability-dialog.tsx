@@ -64,7 +64,7 @@ const GameAvailabilityDialog = ({
             return (
               <div
                 key={vote.playerId}
-                className={`flex justify-between p-2 rounded px-3 items-center ${bg}`}
+                className={`flex justify-between p-2 rounded-md px-3 items-center ${bg}`}
               >
                 <span className="text-sm">
                   {allPlayers.find((p) => p.id === vote.playerId)?.fullName ||

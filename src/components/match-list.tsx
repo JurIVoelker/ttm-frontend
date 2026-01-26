@@ -119,13 +119,15 @@ const MatchListItem = ({
         <MatchInfo match={match} />
         <LineupInfo match={match} />
       </CardContent>
-      <MatchAvailability
-        defaultValue={playersVote?.availability}
-        votes={match.matchAvailabilityVotes}
-        allPlayers={allPlayers}
-        matchId={match.id}
-        saveVote={(availability) => saveVote(availability, match.id)}
-      />
+      {!match.lineup && (
+        <MatchAvailability
+          defaultValue={playersVote?.availability}
+          votes={match.matchAvailabilityVotes}
+          allPlayers={allPlayers}
+          matchId={match.id}
+          saveVote={(availability) => saveVote(availability, match.id)}
+        />
+      )}
     </Card>
   );
 };
@@ -275,7 +277,7 @@ const LineupInfo = ({ match }: { match: MatchDTO }) => {
           <Link
             href={`${mainStore.getState().teamSlug}/spiele/${match.id}/aufstellung`}
             className={cn(
-              "w-full mt-1.5",
+              "w-full mt-2",
               buttonVariants({
                 variant: "secondary",
               }),
@@ -292,7 +294,7 @@ const LineupInfo = ({ match }: { match: MatchDTO }) => {
         </div>
       )}
       {!noLineup && (
-        <div className="space-y-1 mt-1.5">
+        <div className="space-y-1 mt-2">
           {lineup.map((p, i) => (
             <div className="flex items-center gap-1.5" key={p.id}>
               <div
