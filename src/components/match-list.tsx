@@ -119,7 +119,7 @@ const MatchListItem = ({
         <MatchInfo match={match} />
         <LineupInfo match={match} />
       </CardContent>
-      {!match.lineup && (
+      {match.lineup.length === 0 && (
         <MatchAvailability
           defaultValue={playersVote?.availability}
           votes={match.matchAvailabilityVotes}
