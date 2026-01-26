@@ -41,17 +41,21 @@ const TeamPage = () => {
   const onSaveVote = async (availability: Availability, matchId: string) => {
     const playerId = authStore.getState().jwtDecoded?.player?.id;
     if (!playerId) return;
-    matchesResponse.setData(
-      matchesResponse?.data?.map((match) => {
-        const vote = match.matchAvailabilityVotes.find(
-          (vote) => vote.playerId === playerId && vote.matchId === matchId,
-        );
-        if (vote) {
-          vote.availability = availability;
-        }
-        return match;
-      }) || [],
+    const targetMatch = matchesResponse?.data?.find((m) => m.id === matchId);
+    if (!targetMatch) return;
+    const targetVote = targetMatch.matchAvailabilityVotes.find(
+      (v) => v.playerId === playerId && v.matchId === matchId,
     );
+    if (targetVote) {
+      targetVote.availability = availability;
+    } else {
+      targetMatch.matchAvailabilityVotes.push({
+        playerId,
+        matchId,
+        availability,
+      });
+    }
+    matchesResponse.setData(matchesResponse.data!);
   };
 
   return (
