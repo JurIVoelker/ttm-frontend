@@ -1,5 +1,11 @@
-import { Sidebar, SidebarContent, useSidebar } from "../ui/sidebar";
-import { Poppins } from "next/font/google";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarMenu,
+  SidebarMenuButton,
+  useSidebar,
+} from "../ui/sidebar";
 import { cn } from "@/lib/utils";
 import { TeamDTO, TeamType } from "@/types/team";
 import { TEAM_TYPES } from "@/constants/team";
@@ -8,12 +14,14 @@ import { useRouter } from "next/navigation";
 import { mainStore } from "@/store/main-store";
 import SidebarAllTeams from "./sidebar-all-teams";
 import SidebarOwnTeams from "./sidebar-own-teams";
-
-const poppins = Poppins({
-  variable: "--font-poppins",
-  subsets: ["latin"],
-  weight: ["200", "400", "600", "700"],
-});
+import {
+  AddTeamIcon,
+  ArrowReloadHorizontalIcon,
+  ShieldUserIcon,
+  UserCircleIcon,
+} from "hugeicons-react";
+import { isAdmin, isLeader } from "@/lib/permission";
+import ThemeToggle from "../theme-toggle";
 
 const AppSidebar = () => {
   const { toggleSidebar } = useSidebar();
@@ -38,10 +46,12 @@ const AppSidebar = () => {
   const groupedTeams: { type: TeamType; teams: TeamDTO[] }[] = TEAM_TYPES.map(
     (t) => ({ type: t, teams: getTeamsByType(t) }),
   );
+  const admin = isAdmin();
+  const previlegedRole = admin || isLeader();
 
   return (
     <Sidebar>
-      <SidebarContent className={cn("pt-20", poppins.className)}>
+      <SidebarContent className={cn("pt-20")}>
         <SidebarOwnTeams onClickTeam={onClickTeam} />
         <SidebarAllTeams
           noPlayers={noPlayers}
@@ -49,6 +59,33 @@ const AppSidebar = () => {
           onClickTeam={onClickTeam}
         />
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <ThemeToggle />
+          {previlegedRole && (
+            <SidebarMenuButton>
+              <UserCircleIcon strokeWidth={2} />
+              Logout
+            </SidebarMenuButton>
+          )}
+          {admin && (
+            <>
+              <SidebarMenuButton>
+                <AddTeamIcon strokeWidth={2} />
+                Mannschaften
+              </SidebarMenuButton>
+              <SidebarMenuButton>
+                <ShieldUserIcon strokeWidth={2} />
+                Admins verwalten
+              </SidebarMenuButton>
+              <SidebarMenuButton>
+                <ArrowReloadHorizontalIcon strokeWidth={2} />
+                Synchronisation
+              </SidebarMenuButton>
+            </>
+          )}
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 };
