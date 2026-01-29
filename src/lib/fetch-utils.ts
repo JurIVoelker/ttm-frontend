@@ -38,6 +38,7 @@ export const sendRequest = async ({
   const hideMessages = options?.hideMessages ?? false;
 
   if (!jwtPayload || !jwtPayload?.exp) {
+    window.location.pathname = "/login";
     throw new Error("Invalid JWT token");
   }
 
@@ -50,11 +51,13 @@ export const sendRequest = async ({
       jwt = newJwt;
       renewResponse = response;
     } catch (error) {
+      window.location.pathname = "/login";
       console.error("Error renewing JWT:", error);
     }
   }
 
   if (!jwt) {
+    window.location.pathname = "/login";
     return renewResponse || new Response(JSON.stringify({ message: COULD_NOT_RENEW_JWT }), { status: 401 });
   }
 

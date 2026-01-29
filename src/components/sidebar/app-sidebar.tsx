@@ -22,6 +22,7 @@ import {
 } from "hugeicons-react";
 import { isAdmin, isLeader } from "@/lib/permission";
 import ThemeToggle from "../theme-toggle";
+import Link from "next/link";
 
 const AppSidebar = () => {
   const { toggleSidebar } = useSidebar();
@@ -74,10 +75,12 @@ const AppSidebar = () => {
                 <AddTeamIcon strokeWidth={2} />
                 Mannschaften
               </SidebarMenuButton>
-              <SidebarMenuButton>
-                <ShieldUserIcon strokeWidth={2} />
-                Admins verwalten
-              </SidebarMenuButton>
+              <Link href="/admins">
+                <SidebarMenuButton>
+                  <ShieldUserIcon strokeWidth={2} />
+                  Admins verwalten
+                </SidebarMenuButton>
+              </Link>
               <SidebarMenuButton>
                 <ArrowReloadHorizontalIcon strokeWidth={2} />
                 Synchronisation
