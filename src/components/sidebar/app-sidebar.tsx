@@ -17,6 +17,7 @@ import SidebarOwnTeams from "./sidebar-own-teams";
 import {
   AddTeamIcon,
   ArrowReloadHorizontalIcon,
+  Login02Icon,
   ShieldUserIcon,
   UserCircleIcon,
 } from "hugeicons-react";
@@ -94,6 +95,14 @@ const AppSidebar = () => {
                 Logout
               </SidebarMenuButton>
             </ConfirmDialog>
+          )}
+          {!previlegedRole && (
+            <Link href="/login">
+              <SidebarMenuButton>
+                <Login02Icon strokeWidth={2} />
+                Login für Mannschaftsführer
+              </SidebarMenuButton>
+            </Link>
           )}
           {admin && (
             <>
