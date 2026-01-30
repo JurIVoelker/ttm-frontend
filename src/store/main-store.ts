@@ -6,6 +6,7 @@ export type Store = {
   setTeamSlug: (slug: string) => void;
   teams: TeamDTO[];
   setTeams: (teams: TeamDTO[]) => void;
+  reset: () => void;
 };
 
 export const mainStore = create<Store>()((set) => ({
@@ -13,4 +14,9 @@ export const mainStore = create<Store>()((set) => ({
   setTeamSlug: (slug: string) => set({ teamSlug: slug }),
   teams: [],
   setTeams: (teams: TeamDTO[]) => set({ teams }),
+  reset: () =>
+    set({
+      teamSlug: null,
+      teams: [],
+    }),
 }));

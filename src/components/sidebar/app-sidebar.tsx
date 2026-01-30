@@ -27,6 +27,7 @@ import useAuthStore from "@/hooks/use-auth-store";
 import { sendRequest } from "@/lib/fetch-utils";
 import ConfirmDialog from "../confirm-dialog";
 import { useState } from "react";
+import { showMessage } from "@/lib/message";
 
 const AppSidebar = () => {
   const { toggleSidebar } = useSidebar();
@@ -49,8 +50,10 @@ const AppSidebar = () => {
       method: "POST",
       path: "/api/auth/logout",
     });
-    authStore.setJwt(null);
-    window.location.href = "/login";
+    authStore.reset();
+    mainStore.getState().reset();
+    showMessage("Erfolgreich abgemeldet.");
+    push("/login");
   };
 
   const getTeamsByType = (type: TeamType) => {

@@ -13,6 +13,8 @@ export type Store = {
 
   inviteToken: string | null;
   setInviteToken: (token: string | null) => void;
+
+  reset: () => void;
 };
 
 export const authStore = create<Store>()(
@@ -29,6 +31,13 @@ export const authStore = create<Store>()(
 
       inviteToken: null,
       setInviteToken: (token: string | null) => set({ inviteToken: token }),
+
+      reset: () =>
+        set({
+          jwt: null,
+          jwtDecoded: null,
+          inviteToken: null,
+        }),
     }),
     {
       name: "auth-storage",
