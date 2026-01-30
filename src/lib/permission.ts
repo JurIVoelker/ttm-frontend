@@ -34,3 +34,12 @@ export const isPlayerOfTeam = () => {
     jwtDecoded.player?.teams.includes(currentSlug)
   );
 };
+
+export const isPlayer = () => {
+  const jwtDecoded = authStore.getState().jwtDecoded;
+  if (!jwtDecoded) return false;
+
+  return (
+    jwtDecoded.roles.includes("player")
+  );
+};

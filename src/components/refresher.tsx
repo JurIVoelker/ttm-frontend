@@ -10,7 +10,13 @@ const Refresher = () => {
     const splitPath = pathName.split("/");
     if (splitPath.length <= 1) return;
     const newSlug = splitPath[1];
-    const forbiddenSlugs = ["admins"];
+    const forbiddenSlugs = [
+      "admins",
+      "synchronisation",
+      "mannschaften",
+      "login",
+      "benachrichtigungen",
+    ];
     if (forbiddenSlugs.includes(newSlug)) return;
     mainStore.getState().setTeamSlug(newSlug);
   }, [pathName]);

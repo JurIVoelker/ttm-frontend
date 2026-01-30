@@ -21,7 +21,8 @@ export default function App({ Component, pageProps }: AppProps) {
     } else {
       console.log("Service workers are not supported.");
     }
-  }, []);
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigator.serviceWorker]);
 
   useHydrateTeams();
 

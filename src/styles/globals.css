@@ -48,6 +48,8 @@
   --neutral-dark: #845719;
   --neutral-light: #fff6de;
   --neutral-border: #e5c393;
+
+  --apple-blue: #0071e3;
 }
 
 .dark {
@@ -93,6 +95,8 @@
   --neutral-dark: #d6af78;
   --neutral-light: #d6af7825;
   --neutral-border: #d6af784f;
+
+  --apple-blue: #0a84ff;
 }
 
 @theme inline {
@@ -146,6 +150,8 @@
   --color-neutral-dark: var(--neutral-dark);
   --color-neutral-light: var(--neutral-light);
   --color-neutral-border: var(--neutral-border);
+
+  --color-apple-blue: var(--apple-blue);
 }
 
 @layer base {
@@ -196,6 +202,10 @@
     color-mix(in srgb, var(--background, #000) 50%, transparent);
 }
 
+.glow {
+  filter: drop-shadow(0 0 10px var(--primary));
+}
+
 .animate-pop-in {
   animation: pop-in 0.15s ease-out forwards;
 }
@@ -239,6 +249,10 @@
     opacity: 1;
     transform: rotate(0deg);
   }
+}
+
+.blur-2xs {
+  filter: blur(1.25px);
 }
 
 body {

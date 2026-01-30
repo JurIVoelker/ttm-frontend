@@ -18,12 +18,12 @@ import {
   AddTeamIcon,
   ArrowReloadHorizontalIcon,
   Login02Icon,
+  Notification01Icon,
   ShieldUserIcon,
   UserCircleIcon,
 } from "hugeicons-react";
-import { isAdmin, isLeader } from "@/lib/permission";
+import { isAdmin, isLeader, isPlayer } from "@/lib/permission";
 import ThemeToggle from "../theme-toggle";
-import Link from "next/link";
 import useAuthStore from "@/hooks/use-auth-store";
 import { sendRequest } from "@/lib/fetch-utils";
 import ConfirmDialog from "../confirm-dialog";
@@ -51,6 +51,7 @@ const AppSidebar = () => {
       method: "POST",
       path: "/api/auth/logout",
     });
+    toggleSidebar();
     authStore.reset();
     mainStore.getState().reset();
     showMessage("Erfolgreich abgemeldet.");
@@ -68,6 +69,12 @@ const AppSidebar = () => {
   );
   const admin = isAdmin();
   const previlegedRole = admin || isLeader();
+  const anyRole = previlegedRole || isPlayer();
+
+  const navigate = (location: string) => {
+    toggleSidebar();
+    push(location);
+  };
 
   return (
     <Sidebar>
@@ -97,27 +104,32 @@ const AppSidebar = () => {
             </ConfirmDialog>
           )}
           {!previlegedRole && (
-            <Link href="/login">
-              <SidebarMenuButton>
-                <Login02Icon strokeWidth={2} />
-                Login für Mannschaftsführer
-              </SidebarMenuButton>
-            </Link>
+            <SidebarMenuButton onClick={() => navigate("/login")}>
+              <Login02Icon strokeWidth={2} />
+              Login für Mannschaftsführer
+            </SidebarMenuButton>
+          )}
+          {anyRole && (
+            <SidebarMenuButton onClick={() => navigate("/benachrichtigungen")}>
+              <Notification01Icon strokeWidth={2} />
+              Benachrichtigungen
+            </SidebarMenuButton>
           )}
           {admin && (
             <>
-              <SidebarMenuButton>
+              <SidebarMenuButton onClick={() => navigate("/mannschaften")}>
                 <AddTeamIcon strokeWidth={2} />
                 Mannschaften
               </SidebarMenuButton>
-              <Link href="/admins">
-                <SidebarMenuButton>
-                  <ShieldUserIcon strokeWidth={2} />
-                  Admins verwalten
-                </SidebarMenuButton>
-              </Link>
+              <SidebarMenuButton onClick={() => navigate("/admins")}>
+                <ShieldUserIcon strokeWidth={2} />
+                Admins verwalten
+              </SidebarMenuButton>
               <SidebarMenuButton>
-                <ArrowReloadHorizontalIcon strokeWidth={2} />
+                <ArrowReloadHorizontalIcon
+                  strokeWidth={2}
+                  onClick={() => navigate("/synchronisation")}
+                />
                 Synchronisation
               </SidebarMenuButton>
             </>
