@@ -66,7 +66,7 @@ const usePwaInfo = () => {
         showMessage(
           "Überprüfe, ob die Testbenachrichtigung bei dir angekommen ist.",
         );
-      }, 2000);
+      }, 4000);
     } catch (error) {
       if (error instanceof Error) {
         setError(

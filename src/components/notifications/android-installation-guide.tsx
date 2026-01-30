@@ -23,7 +23,7 @@ import Image from "next/image";
 const AndroidInstallationGuide = ({ ...props }) => {
   return (
     <div {...props}>
-      <Title>Webseite als App installieren</Title>
+      <Title>Benachrichtigungen aktivieren</Title>
       <p className="mt-8">
         Um Benachrichtigungen zu aktivieren, musst du zuerst die Webseite als
         App installieren.
