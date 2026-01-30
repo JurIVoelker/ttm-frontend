@@ -149,7 +149,7 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
         />
         <div className="space-y-6">
           {isCreate && (
-            <Card className="gap-4">
+            <Card className="gap-4 animate-pop-in-subtle">
               <CardHeader className="text-muted-foreground font-medium">
                 <h3>Name des Gegnerteams</h3>
               </CardHeader>
@@ -175,7 +175,7 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
               </CardContent>
             </Card>
           )}
-          <Card className="gap-4">
+          <Card className="gap-4 animate-pop-in-subtle">
             <CardHeader className="text-muted-foreground font-medium">
               <h3>Datum und Uhrzeit</h3>
             </CardHeader>
@@ -219,7 +219,7 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
               />
             </CardContent>
           </Card>
-          <Card className="gap-4">
+          <Card className="gap-4 animate-pop-in-subtle">
             <CardHeader className="text-muted-foreground font-medium">
               <h3>Spielort</h3>
             </CardHeader>
@@ -321,7 +321,7 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
               />
             </CardContent>
           </Card>
-          <Card className="p-4 space-y-4">
+          <Card className="p-4 space-y-4 animate-pop-in-subtle">
             <FormField
               control={form.control}
               name="isCupMatch"

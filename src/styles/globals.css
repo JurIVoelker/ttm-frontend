@@ -200,6 +200,10 @@
   animation: pop-in 0.15s ease-out forwards;
 }
 
+.animate-pop-in-subtle {
+  animation: pop-in-subtle 0.15s ease-out forwards;
+}
+
 .animate-fade-in-rotate {
   animation: fade-in-rotate 0.2s ease-out forwards;
 }
@@ -208,6 +212,17 @@
   0% {
     opacity: 0.4;
     transform: scale(0.3);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pop-in-subtle {
+  0% {
+    opacity: 0.1;
+    transform: scale(0.9);
   }
   100% {
     opacity: 1;

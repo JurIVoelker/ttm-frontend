@@ -30,11 +30,17 @@ const EditMatchPage = () => {
 
 const LoadingState = () => {
   return (
-    <div className="space-y-4 z-1">
-      <Skeleton className="h-50 w-full" />
-      <Skeleton className="h-74 w-full" />
-      <Skeleton className="h-12 w-full" />
-    </div>
+    <>
+      <div className="flex gap-2 mt-10">
+        <Skeleton className="w-full h-10 z-1" />
+        <Skeleton className="w-full h-10 z-1" />
+      </div>
+      <div className="space-y-6 z-1 mt-4 pb-18">
+        <Skeleton className="h-50 w-full" />
+        <Skeleton className="h-74 w-full" />
+        <Skeleton className="h-12 w-full" />
+      </div>
+    </>
   );
 };
 

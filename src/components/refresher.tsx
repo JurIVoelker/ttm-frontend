@@ -9,7 +9,10 @@ const Refresher = () => {
     if (!pathName) return;
     const splitPath = pathName.split("/");
     if (splitPath.length <= 1) return;
-    mainStore.getState().setTeamSlug(splitPath[1]);
+    const newSlug = splitPath[1];
+    const forbiddenSlugs = ["admins"];
+    if (forbiddenSlugs.includes(newSlug)) return;
+    mainStore.getState().setTeamSlug(newSlug);
   }, [pathName]);
   return <></>;
 };

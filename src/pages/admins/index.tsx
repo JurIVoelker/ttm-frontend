@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useFetchData } from "@/hooks/fetch-data";
 import { Admin } from "@/types/admin";
 import { PlusSignIcon } from "hugeicons-react";
-import { XIcon } from "lucide-react";
+import { User2, XIcon } from "lucide-react";
 
 const AdminsPage = () => {
   const { data: admins, setData: setAdmins } = useFetchData<Admin[]>({
@@ -26,13 +26,18 @@ const AdminsPage = () => {
             key={a.id}
             className="flex items-center justify-between border p-2 px-3 rounded-md"
           >
-            <div>
-              <div className="translate-y-0.5">{a.fullName}</div>
-              <div className="text-sm text-muted-foreground -translate-y-px">
-                {a.email}
+            <div className="flex gap-2 items-center">
+              <div className="bg-secondary flex items-center justify-center rounded-full size-10">
+                <User2 className="text-primary size-5.5" />
+              </div>
+              <div>
+                <div className="translate-y-0.5">{a.fullName}</div>
+                <div className="text-sm text-muted-foreground -translate-y-px">
+                  {a.email}
+                </div>
               </div>
             </div>
-            <Button size="icon">
+            <Button size="icon-sm">
               <XIcon />
             </Button>
           </div>
