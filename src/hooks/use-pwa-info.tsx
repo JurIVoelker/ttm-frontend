@@ -1,9 +1,11 @@
 import { sendRequest } from "@/lib/fetch-utils";
+import { showMessage } from "@/lib/message";
 import { getVapidUint8ArrayKey } from "@/lib/push-notifications";
 import { useEffect, useState } from "react";
 
 const usePwaInfo = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubscribing, setIsSubscribing] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [sub, setSub] = useState<PushSubscription | null>(null);
@@ -44,6 +46,7 @@ const usePwaInfo = () => {
   const subscribe = async () => {
     try {
       console.log("Subscribing to push notifications...");
+      setIsSubscribing(true);
       const registration = await navigator.serviceWorker.getRegistration();
       if (!registration) {
         throw new Error("Service Worker Registrierung nicht gefunden.");
@@ -58,6 +61,12 @@ const usePwaInfo = () => {
         method: "POST",
         body: sub.toJSON(),
       });
+      showMessage("Benachrichtigungen wurden erfolgreich aktiviert");
+      setTimeout(() => {
+        showMessage(
+          "Überprüfe, ob die Testbenachrichtigung bei dir angekommen ist.",
+        );
+      }, 2000);
     } catch (error) {
       if (error instanceof Error) {
         setError(
@@ -65,6 +74,8 @@ const usePwaInfo = () => {
         );
       }
       console.error("Subscription failed: ", error);
+    } finally {
+      setIsSubscribing(false);
     }
   };
 
@@ -77,6 +88,7 @@ const usePwaInfo = () => {
     error,
     subscribe,
     isSupported,
+    isSubscribing,
   };
 };
 

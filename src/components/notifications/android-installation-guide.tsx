@@ -28,7 +28,7 @@ const AndroidInstallationGuide = ({ ...props }) => {
         Um Benachrichtigungen zu aktivieren, musst du zuerst die Webseite als
         App installieren.
       </p>
-      <StepTitle>Menü öffnen</StepTitle>
+      <StepTitle>1. Menü öffnen</StepTitle>
       <p className="mb-2">
         Öffne das Menü in deiner Adressleiste über die drei Punkte{" "}
         <MoreVertical className="size-5 inline" />.

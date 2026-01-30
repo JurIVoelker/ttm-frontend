@@ -4,6 +4,7 @@ import IosInstallationGuide from "@/components/notifications/ios-installation-gu
 import Title from "@/components/title";
 import { Button } from "@/components/ui/button";
 import usePwaInfo from "@/hooks/use-pwa-info";
+import { Notification01Icon, NotificationOff01Icon } from "hugeicons-react";
 
 export default function Home() {
   const {
@@ -15,6 +16,7 @@ export default function Home() {
     subscribe,
     unsubscribe,
     error,
+    isSubscribing,
   } = usePwaInfo();
 
   if (isLoading) return <LoadingState />;
@@ -45,19 +47,39 @@ export default function Home() {
   const NotificationContent = (
     <div key={3}>
       <Title className="mb-8">Push-Benachrichtigungen</Title>
-      {subscription && (
-        <div>
-          <h2>Push-Benachrichtigungen sind aktiviert</h2>
-          <Button onClick={unsubscribe}>Deaktivieren</Button>
-        </div>
-      )}
-      {!subscription && (
-        <div>
-          <h2>Push-Benachrichtigungen sind deaktiviert</h2>
-          <Button onClick={subscribe}>Aktivieren</Button>
-        </div>
-      )}
-      {error && <>{error}</>}
+      <div>
+        {subscription && (
+          <div className="border p-4 bg-card rounded-md">
+            <h2 className="flex items-center gap-1">
+              <Notification01Icon className="shrink-0 size-5" strokeWidth={2} />
+              Push-Benachrichtigungen sind aktiviert
+            </h2>
+            <Button onClick={unsubscribe} className="mt-2">
+              <NotificationOff01Icon strokeWidth={2} /> Deaktivieren
+            </Button>
+          </div>
+        )}
+        {!subscription && (
+          <>
+            <h2>Push-Benachrichtigungen sind deaktiviert</h2>
+            <Button
+              onClick={subscribe}
+              className="mt-2"
+              disabled={isSubscribing}
+            >
+              Aktivieren
+            </Button>
+          </>
+        )}
+        {error && (
+          <>
+            <h2 className="text-destructive mt-8 text-lg">
+              Fehler bei der Aktivierung
+            </h2>
+            <p className="text-destructive/80 mt-2">{error}</p>
+          </>
+        )}
+      </div>
     </div>
   );
 
@@ -80,30 +102,7 @@ export default function Home() {
     });
   }
 
-  return (
-    <Layout>
-      {/* <IosInstallationGuide /> */}
-      {steps.map((step) => step.component)}
-      {/* {sub ? (
-        <div>
-          <h2>Subscribed to Push Notifications</h2>
-          <pre>{JSON.stringify(sub.toJSON(), null, 2)}</pre>
-          <button onClick={unsubscribe}>Unsubscribe</button>
-        </div>
-      ) : (
-        <div>
-          <h2>Not Subscribed to Push Notifications</h2>
-          <button onClick={subscribe}>Subscribe</button>
-        </div>
-      )}
-      {error && (
-        <div style={{ color: "red" }}>
-          <h3>Error:</h3>
-          <pre>{error}</pre>
-        </div>
-      )} */}
-    </Layout>
-  );
+  return <Layout>{steps.map((step) => step.component)}</Layout>;
 }
 
 const LoadingState = () => {
