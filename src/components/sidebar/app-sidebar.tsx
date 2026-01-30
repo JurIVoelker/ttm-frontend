@@ -23,11 +23,17 @@ import {
 import { isAdmin, isLeader } from "@/lib/permission";
 import ThemeToggle from "../theme-toggle";
 import Link from "next/link";
+import useAuthStore from "@/hooks/use-auth-store";
+import { sendRequest } from "@/lib/fetch-utils";
+import ConfirmDialog from "../confirm-dialog";
+import { useState } from "react";
 
 const AppSidebar = () => {
   const { toggleSidebar } = useSidebar();
   const isMobile = useIsMobile();
   const { push } = useRouter();
+  const { authStore } = useAuthStore();
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   const teams = mainStore((state) => state.teams);
 
@@ -36,6 +42,15 @@ const AppSidebar = () => {
       toggleSidebar();
     }
     push(`/${team.slug}`);
+  };
+
+  const onLogout = async () => {
+    await sendRequest({
+      method: "POST",
+      path: "/api/auth/logout",
+    });
+    authStore.setJwt(null);
+    window.location.href = "/login";
   };
 
   const getTeamsByType = (type: TeamType) => {
@@ -64,10 +79,18 @@ const AppSidebar = () => {
         <SidebarMenu>
           <ThemeToggle />
           {previlegedRole && (
-            <SidebarMenuButton>
-              <UserCircleIcon strokeWidth={2} />
-              Logout
-            </SidebarMenuButton>
+            <ConfirmDialog
+              title="Logout"
+              description="Möchtest du dich wirklich abmelden?"
+              onConfirm={onLogout}
+              open={logoutConfirmOpen}
+              setOpen={setLogoutConfirmOpen}
+            >
+              <SidebarMenuButton onClick={() => setLogoutConfirmOpen(true)}>
+                <UserCircleIcon strokeWidth={2} />
+                Logout
+              </SidebarMenuButton>
+            </ConfirmDialog>
           )}
           {admin && (
             <>
