@@ -52,9 +52,12 @@ export default function Home() {
           <div className="border p-4 bg-card rounded-md">
             <h2 className="flex items-center gap-1">
               <Notification01Icon className="shrink-0 size-5" strokeWidth={2} />
-              Push-Benachrichtigungen sind aktiviert
+              Benachrichtigungen
             </h2>
-            <Button onClick={unsubscribe} className="mt-2">
+            <p className="text-muted-foreground mt-1">
+              Push Benachrichtigungen sind erfolgreich aktiviert.
+            </p>
+            <Button onClick={unsubscribe} className="mt-4">
               <NotificationOff01Icon strokeWidth={2} /> Deaktivieren
             </Button>
           </div>
