@@ -4,6 +4,7 @@ import NavigationButtons from "@/components/navigation-buttons";
 import ReplacementPlayerDrawer from "@/components/replacement-player-drawer";
 import Title from "@/components/title";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
@@ -114,10 +115,17 @@ const LineupPage = () => {
       </div>
       <NavigationButtons
         onSave={onSave}
-        isSaving={loading}
+        isSaving={loading || match.loading}
         className="mt-2"
         backNavigation={`/${teamSlug}#match-card-${matchId}`}
       />
+      {match.loading && (
+        <div className="space-y-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="w-full h-9" />
+          ))}
+        </div>
+      )}
       <LineupSelection
         match={match.data}
         players={players.data?.players}

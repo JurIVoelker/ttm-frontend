@@ -1,6 +1,7 @@
 import Layout from "@/components/layout";
 import NavigationButtons from "@/components/navigation-buttons";
 import Title from "@/components/title";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
@@ -84,17 +85,20 @@ const ManagePlayersPage = () => {
 
   return (
     <Layout>
+      <Title>Spieler</Title>
+      <p className="pt-4 text-sm max-w-150 text-muted-foreground">
+        Die folgenden Listen zeigen die Spieler die in den jeweiligen
+        Mannschaften gemeldet sind. Wähle die Spieler aus, die in deiner
+        Mannschaft spielen sollen.
+      </p>
+      <NavigationButtons
+        onSave={onSaveSelection}
+        isSaving={isSaving || teamPositionsResponse.loading}
+      />
       {loading ? (
         <LoadingState />
       ) : dataReceived ? (
-        <div className="pb-16">
-          <Title>Spieler</Title>
-          <p className="pt-4 text-sm max-w-150 text-muted-foreground">
-            Die folgenden Listen zeigen die Spieler die in den jeweiligen
-            Mannschaften gemeldet sind. Wähle die Spieler aus, die in deiner
-            Mannschaft spielen sollen.
-          </p>
-          <NavigationButtons onSave={onSaveSelection} isSaving={isSaving} />
+        <div className="pb-16 animate-pop-in-subtle">
           <div className="space-y-4 md:mt-6">
             <TeamPositionsCard
               players={targetTeamPositions}
@@ -208,7 +212,14 @@ const TeamPositionsCard = ({
 };
 
 const LoadingState = () => {
-  return <></>;
+  return (
+    <>
+      <Skeleton className="w-full h-70 mt-6" />
+      <Skeleton className="w-full h-70 mt-4" />
+      <Skeleton className="w-full h-70 mt-4" />
+      <Skeleton className="w-full h-70 mt-4" />
+    </>
+  );
 };
 
 export default ManagePlayersPage;
