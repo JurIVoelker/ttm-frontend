@@ -83,7 +83,10 @@ const MatchList = ({
         />
       ))}
       {isLeaderOfTeam() && (
-        <Link href={`${teamSlug}/spiele/neu`} className="rounded-2xl">
+        <Link
+          href={`${teamSlug}/spiele/neu`}
+          className="rounded-2xl animate-pop-in-subtle"
+        >
           <Card className="flex justify-center items-center hover:bg-secondary/70 h-full min-h-40">
             <PlusIcon className="text-primary" />
           </Card>
@@ -109,7 +112,10 @@ const MatchListItem = ({
   );
 
   return (
-    <Card id={`match-card-${match.id}`} className="rounded-2xl">
+    <Card
+      id={`match-card-${match.id}`}
+      className="rounded-2xl animate-pop-in-subtle"
+    >
       <MatchCardHeader
         title={match.enemyName}
         match={match}

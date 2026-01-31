@@ -1,3 +1,4 @@
+import { MIN_FETCH_DURATION } from "@/config";
 import { sendRequest } from "@/lib/fetch-utils";
 import { useCallback, useEffect, useState } from "react";
 
@@ -16,6 +17,7 @@ export function useFetchData<T>(props: FetchDataProps) {
   const { method, path, body, ready = true } = props;
 
   const fetchData = useCallback(async () => {
+    const timeBeforeFetch = Date.now();
     const response = await sendRequest({
       path,
       method,
@@ -33,6 +35,12 @@ export function useFetchData<T>(props: FetchDataProps) {
     }
 
     const data = (await response.json()) as T;
+    const timeAfterFetch = Date.now();
+    const timeToWait = Math.max(
+      0,
+      MIN_FETCH_DURATION - (timeAfterFetch - timeBeforeFetch),
+    );
+    await new Promise((resolve) => setTimeout(resolve, timeToWait));
     setData(data);
   }, [path, method, body]);
 

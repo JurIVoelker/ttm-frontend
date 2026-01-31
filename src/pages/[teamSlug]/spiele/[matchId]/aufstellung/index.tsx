@@ -4,7 +4,7 @@ import NavigationButtons from "@/components/navigation-buttons";
 import ReplacementPlayerDrawer from "@/components/replacement-player-drawer";
 import Title from "@/components/title";
 import { Badge } from "@/components/ui/badge";
-import { useFetchData } from "@/hooks/fetch-data";
+import { useFetchData } from "@/hooks/use-fetch-data";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
 import { groupPlayersToOtherTeams } from "@/lib/team";

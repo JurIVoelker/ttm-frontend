@@ -211,7 +211,7 @@
 }
 
 .animate-pop-in-subtle {
-  animation: pop-in-subtle 0.15s ease-out forwards;
+  animation: pop-in-subtle 0.17s ease-out forwards;
 }
 
 .animate-fade-in-rotate {
@@ -232,7 +232,11 @@
 @keyframes pop-in-subtle {
   0% {
     opacity: 0.1;
-    transform: scale(0.9);
+    transform: scale(0.99);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1);
   }
   100% {
     opacity: 1;

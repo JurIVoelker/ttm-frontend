@@ -54,7 +54,7 @@ export default function Home() {
               <Notification01Icon className="shrink-0 size-5" strokeWidth={2} />
               Benachrichtigungen
             </h2>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-muted-foreground mt-1 text-sm">
               Push Benachrichtigungen sind erfolgreich aktiviert.
             </p>
             <Button onClick={unsubscribe} className="mt-4">

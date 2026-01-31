@@ -2,7 +2,7 @@ import AddAdminModal from "@/components/add-admin-modal";
 import Layout from "@/components/layout";
 import Title from "@/components/title";
 import { Button } from "@/components/ui/button";
-import { useFetchData } from "@/hooks/fetch-data";
+import { useFetchData } from "@/hooks/use-fetch-data";
 import { Admin } from "@/types/admin";
 import { PlusSignIcon } from "hugeicons-react";
 import { User2, XIcon } from "lucide-react";

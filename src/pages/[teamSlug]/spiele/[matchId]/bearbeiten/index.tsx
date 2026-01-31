@@ -2,7 +2,7 @@ import EditMatchForm from "@/components/edit-match-form";
 import Layout from "@/components/layout";
 import Title from "@/components/title";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useFetchData } from "@/hooks/fetch-data";
+import { useFetchData } from "@/hooks/use-fetch-data";
 import { mainStore } from "@/store/main-store";
 import { SingleMatchDTO } from "@/types/match";
 import { usePathname } from "next/navigation";

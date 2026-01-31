@@ -1,7 +1,7 @@
 import Layout from "@/components/layout";
 import NavigationButtons from "@/components/navigation-buttons";
 import Title from "@/components/title";
-import { useFetchData } from "@/hooks/fetch-data";
+import { useFetchData } from "@/hooks/use-fetch-data";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
 import { groupPlayersToOtherTeams } from "@/lib/team";

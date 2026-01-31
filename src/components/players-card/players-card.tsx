@@ -13,7 +13,7 @@ import { Copy01Icon, Login02Icon, PencilEdit02Icon } from "hugeicons-react";
 import { Badge } from "../ui/badge";
 import { mainStore } from "@/store/main-store";
 import Link from "next/link";
-import { useFetchData } from "@/hooks/fetch-data";
+import { useFetchData } from "@/hooks/use-fetch-data";
 import { showMessage } from "@/lib/message";
 import { useRouter } from "next/router";
 import LeaveTeamButton from "./leave-team";
@@ -52,7 +52,7 @@ const PlayersCard = ({ players }: { players: PlayersOfTeamDTO[] }) => {
     : null;
 
   return (
-    <Card className="gap-4">
+    <Card className="gap-4 animate-pop-in-subtle">
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
           <span className="h-fit text-lg">Spieler</span>

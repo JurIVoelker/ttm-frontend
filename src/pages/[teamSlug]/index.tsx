@@ -4,7 +4,7 @@ import PlayersCard from "@/components/players-card/players-card";
 import Title from "@/components/title";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useFetchData } from "@/hooks/fetch-data";
+import { useFetchData } from "@/hooks/use-fetch-data";
 import { authStore } from "@/store/auth-store";
 import { mainStore } from "@/store/main-store";
 import { Availability, MatchesDTO } from "@/types/match";
@@ -64,7 +64,7 @@ const TeamPage = () => {
         <LoadingState />
       ) : playerResponse.data !== null && !playerResponse.loading ? (
         <div className="space-y-6">
-          <Title>{team?.name}</Title>
+          <Title className="animate-pop-in-subtle">{team?.name}</Title>
           <PlayersCard players={playerResponse.data.players} />
           <MatchList
             matches={matchesResponse.data || []}
@@ -85,6 +85,11 @@ const LoadingState = () => {
       <Skeleton className="w-full h-8" />
       <Separator className="mt-2 w-full" />
       <Skeleton className="w-full h-56 mt-6" />
+      <div className="space-y-4 pb-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 md:space-y-0 mt-6">
+        {Array.from({ length: 10 }).map((_, index) => (
+          <Skeleton key={index} className="w-full h-106" />
+        ))}
+      </div>
     </>
   );
 };

@@ -72,8 +72,11 @@ const AppSidebar = () => {
   const anyRole = previlegedRole || isPlayer();
 
   const navigate = (location: string) => {
-    toggleSidebar();
-    push(location);
+    if (isMobile) {
+      toggleSidebar();
+    }
+    const path = location.startsWith("/") ? location : "/" + location;
+    push(path);
   };
 
   return (
