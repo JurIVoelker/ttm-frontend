@@ -232,7 +232,7 @@
 @keyframes pop-in-subtle {
   0% {
     opacity: 0.1;
-    transform: scale(0.99);
+    transform: scale(0.97);
   }
   50% {
     opacity: 0.55;
