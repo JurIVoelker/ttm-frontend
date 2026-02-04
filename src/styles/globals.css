@@ -224,12 +224,15 @@
 
 @keyframes button-click {
   0% {
+    opacity: 1;
     transform: scale(1);
   }
   25% {
+    opacity: 0.9;
     transform: scale(0.96);
   }
   100% {
+    opacity: 1;
     transform: scale(1);
   }
 }
