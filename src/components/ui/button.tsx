@@ -49,6 +49,7 @@ function Button({
   variant = "default",
   size = "default",
   asChild = false,
+  onClick,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
@@ -56,12 +57,28 @@ function Button({
   }) {
   const Comp = asChild ? Slot : "button";
 
+  const [isClicked, setIsClicked] = React.useState(false);
+
+  const performClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setIsClicked(true);
+    if (onClick) {
+      onClick(event);
+    }
+    setTimeout(() => {
+      setIsClicked(false);
+    }, 200);
+  };
+
   return (
     <Comp
       data-slot="button"
       data-variant={variant}
       data-size={size}
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(
+        buttonVariants({ variant, size, className }),
+        isClicked && "animate-click",
+      )}
+      onClick={performClick}
       {...props}
     />
   );
