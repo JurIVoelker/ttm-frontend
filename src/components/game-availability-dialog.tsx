@@ -1,9 +1,8 @@
 "use client";
 import { useState } from "react";
-import { buttonVariants } from "./ui/button";
+import { Button } from "./ui/button";
 import { HelpCircleIcon, Info } from "lucide-react";
 import { Cancel01Icon, Tick01Icon } from "hugeicons-react";
-import { cn } from "@/lib/utils";
 import { Badge } from "./ui/badge";
 import { PlayersOfTeamDTO } from "@/types/player";
 import { MatchAvailabilityVote } from "@/types/match";
@@ -24,24 +23,24 @@ const GameAvailabilityDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger
-        onClick={() => {
-          setIsOpen(true);
-        }}
-        className={cn(
-          buttonVariants({ variant: "outline" }),
-          "w-full justify-center text-sm",
-        )}
-        disabled={votes.length === 0}
-      >
-        {votes.length > 0 ? (
-          <>
-            <Info />
-            Abstimmungen anzeigen ({votes.length})
-          </>
-        ) : (
-          <>Noch keine Abstimmungen</>
-        )}
+      <DialogTrigger className="w-full">
+        <Button
+          className="w-full grow justify-center text-sm"
+          variant="outline"
+          disabled={votes.length === 0}
+          onClick={() => {
+            setIsOpen(true);
+          }}
+        >
+          {votes.length > 0 ? (
+            <>
+              <Info />
+              Abstimmungen anzeigen ({votes.length})
+            </>
+          ) : (
+            <>Noch keine Abstimmungen</>
+          )}
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Abstimmungen</DialogTitle>
