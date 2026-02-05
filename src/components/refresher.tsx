@@ -17,7 +17,11 @@ const Refresher = () => {
       "login",
       "benachrichtigungen",
     ];
-    if (forbiddenSlugs.includes(newSlug)) return;
+    if (forbiddenSlugs.includes(newSlug)) {
+      mainStore.getState().setTeamSlug(null);
+      return;
+    }
+
     mainStore.getState().setTeamSlug(newSlug);
   }, [pathName]);
   return <></>;

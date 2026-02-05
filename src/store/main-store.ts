@@ -3,7 +3,7 @@ import { create } from "zustand";
 
 export type Store = {
   teamSlug: string | null;
-  setTeamSlug: (slug: string) => void;
+  setTeamSlug: (slug: string | null) => void;
   teams: TeamDTO[];
   setTeams: (teams: TeamDTO[]) => void;
   reset: () => void;
@@ -11,7 +11,7 @@ export type Store = {
 
 export const mainStore = create<Store>()((set) => ({
   teamSlug: null,
-  setTeamSlug: (slug: string) => set({ teamSlug: slug }),
+  setTeamSlug: (slug: string | null) => set({ teamSlug: slug }),
   teams: [],
   setTeams: (teams: TeamDTO[]) => set({ teams }),
   reset: () =>
