@@ -225,15 +225,15 @@
 @keyframes button-click {
   0% {
     opacity: 1;
-    transform: scale(1);
+    transform: scaleY(1) scaleX(1);
   }
   25% {
     opacity: 0.9;
-    transform: scale(0.96);
+    transform: scaleY(0.9) scaleX(var(--animate-scale-x));
   }
   100% {
     opacity: 1;
-    transform: scale(1);
+    transform: scaleY(1) scaleX(1);
   }
 }
 
