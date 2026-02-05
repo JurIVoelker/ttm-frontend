@@ -38,8 +38,8 @@ const Mannschaften = () => {
 
   return (
     <Layout>
-      <Title>Mannschaften</Title>
-      <div className="flex flex-col mt-8 gap-2">
+      <Title className="animate-pop-in-subtle">Mannschaften</Title>
+      <div className="flex flex-col mt-8 gap-2 animate-pop-in-subtle">
         <Button variant="outline">
           <ArrowReloadHorizontalIcon strokeWidth={2} /> Importieren
         </Button>
@@ -65,7 +65,10 @@ const Mannschaften = () => {
           );
 
           return (
-            <div key={teamTypeGroup.teamType} className="space-y-4">
+            <div
+              key={teamTypeGroup.teamType}
+              className="space-y-4 md:grid md:grid-cols-2 gap-4 lg:grid-cols-3 md:space-y-0"
+            >
               {indexArray.map((players, index) => {
                 const leaders = leaderFetch.data?.filter((leader) =>
                   leader.team.some(
@@ -84,7 +87,7 @@ const Mannschaften = () => {
                   );
 
                 return (
-                  <Card key={index} className="gap-3">
+                  <Card key={index} className="gap-3 animate-pop-in-subtle">
                     <CardHeader>
                       <CardTitle className="text-lg">
                         {getTeamName(teamTypeGroup.teamType, index + 1)}
@@ -151,12 +154,14 @@ const LoadingState = () => (
     <Separator />
     <Skeleton className="h-9 w-full mb-2 mt-8" />
     <Skeleton className="h-9 w-full mb-2 mt-2" />
-    <Skeleton className="h-80 w-full mb-2 mt-6" />
-    <Skeleton className="h-80 w-full mb-2 mt-4" />
-    <Skeleton className="h-80 w-full mb-2 mt-4" />
-    <Skeleton className="h-80 w-full mb-2 mt-4" />
-    <Skeleton className="h-80 w-full mb-2 mt-4" />
-    <Skeleton className="h-80 w-full mb-2 mt-4" />
+    <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 lg:grid-cols-3 mt-6 md:space-y-0">
+      <Skeleton className="h-80 w-full" />
+      <Skeleton className="h-80 w-full" />
+      <Skeleton className="h-80 w-full" />
+      <Skeleton className="h-80 w-full" />
+      <Skeleton className="h-80 w-full" />
+      <Skeleton className="h-80 w-full" />
+    </div>
   </Layout>
 );
 
