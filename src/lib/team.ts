@@ -1,5 +1,6 @@
 import { PlayersOfTeamDTO } from "@/types/player";
-import { TeamDTO, TeamPositionsDTO } from "@/types/team";
+import { TeamDTO, TeamPositionsDTO, TeamType } from "@/types/team";
+import { intToRoman } from "./romanUtils";
 
 interface GroupedTeamPlayers {
   currentTeam?: TeamDTO;
@@ -43,4 +44,24 @@ export const groupPlayersToOtherTeams = ({ currentTeam, allPositions, teams }: G
   }
 
   return otherTeamPositions;
+}
+
+export const translateTeamType = (teamType: TeamType) => {
+  if (teamType === "ERWACHSENE") return "Erwachsene";
+  if (teamType === "DAMEN") return "Damen";
+  if (teamType.startsWith("JUGEND")) {
+    const age = teamType.split("_")[1];
+    return `Jugend U${age}`;
+  }
+  if (teamType.startsWith("MADCHEN")) {
+    const age = teamType.split("_")[1];
+    return `Mädchen U${age}`;
+  }
+
+  return teamType;
+}
+
+export const getTeamName = (teamType: TeamType, index: number) => {
+  const translatedType = translateTeamType(teamType);
+  return `${translatedType} ${intToRoman(index)}`;
 }
