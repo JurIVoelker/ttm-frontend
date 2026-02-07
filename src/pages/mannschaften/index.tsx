@@ -113,7 +113,7 @@ const Mannschaften = () => {
                             Mannschaft eingetragen.
                           </div>
                         ))}
-                      <h3 className="mb-1.5 mt-5">Spieler</h3>
+                      <h3 className="mb-1.5 mt-5">Meldungen</h3>
                       <div className="text-sm text-muted-foreground">
                         {players.map((player, index) => (
                           <span

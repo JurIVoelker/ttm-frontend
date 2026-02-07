@@ -49,6 +49,8 @@
   --neutral-light: #fff6de;
   --neutral-border: #e5c393;
 
+  --glassy-border: rgba(255, 255, 255, 0.842);
+
   --apple-blue: #0071e3;
 }
 
@@ -95,6 +97,8 @@
   --neutral-dark: #d6af78;
   --neutral-light: #d6af7825;
   --neutral-border: #d6af784f;
+
+  --glassy-border: rgba(255, 255, 255, 0.04);
 
   --apple-blue: #0a84ff;
 }
@@ -152,6 +156,7 @@
   --color-neutral-border: var(--neutral-border);
 
   --color-apple-blue: var(--apple-blue);
+  --color-glassy-border: var(--glassy-border);
 }
 
 @layer base {
@@ -278,6 +283,17 @@
   filter: blur(1.25px);
 }
 
-body {
-  @apply max-h-screen overflow-hidden;
+.bg-blurred {
+  backdrop-filter: blur(10px);
+}
+
+.bg-glassy-b {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--secondary) 80%, transparent),
+    color-mix(in srgb, var(--secondary) 60%, transparent)
+  );
+  backdrop-filter: blur(15px);
+  box-shadow: inset 0 -3px 6px var(--color-glassy-border);
+  border-bottom: 1px inset var(--color-border);
 }
