@@ -7,13 +7,15 @@ import { Button } from "@/components/ui/button";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { PlayerGroup } from "@/lib/player.sort";
 import { getTeamName } from "@/lib/team";
+import { cn } from "@/lib/utils";
 import { TeamPositionsDTO, TeamType } from "@/types/team";
 import {
-  closestCenter,
   DndContext,
   DragOverEvent,
+  DragOverlay,
   KeyboardSensor,
   PointerSensor,
+  rectIntersection,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -33,6 +35,8 @@ const PlayerPositionsPage = () => {
     method: "GET",
     path: "/api/teams/types/positions",
   });
+
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -100,22 +104,27 @@ const PlayerPositionsPage = () => {
         backNavigation="/mannschaften"
       />
       <DndContext
+        onDragStart={(event) => setActiveId(String(event.active.id))}
+        onDragEnd={() => setActiveId(null)}
+        onDragCancel={() => setActiveId(null)}
         sensors={sensors}
-        collisionDetection={closestCenter}
+        collisionDetection={rectIntersection}
         onDragOver={onDragOver}
         autoScroll={false}
       >
-        {groupedTeams.map((team, index) => {
-          if (targetTeamType === "") return null;
-          console.log(team);
-          if (team.players.length === 0)
-            return (
-              <SortableContext
-                items={targetPlayers?.map((player) => player.id) || []}
-                key={index + 1}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="space-y-2 mt-6 border p-5 rounded-lg">
+        <SortableContext
+          items={targetPlayers?.map((player) => player.id) || []}
+          key={1}
+          strategy={verticalListSortingStrategy}
+        >
+          {groupedTeams.map((team, index) => {
+            if (targetTeamType === "") return null;
+            if (team.players.length === 0)
+              return (
+                <div
+                  className="space-y-2 mt-6 border p-5 rounded-lg"
+                  key={index}
+                >
                   <p className="font-medium mb-6">
                     {getTeamName(targetTeamType, index + 1)}
                   </p>
@@ -133,21 +142,18 @@ const PlayerPositionsPage = () => {
                     Neuen Spieler hinzufügen
                   </Button>
                 </div>
-              </SortableContext>
-            );
-          return (
-            <SortableContext
-              items={targetPlayers?.map((player) => player.id) || []}
-              key={team.teamName}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-2 mt-6 border p-5 rounded-lg">
+              );
+            return (
+              <div className="space-y-2 mt-6 border p-5 rounded-lg" key={index}>
                 <h3 className="mb-4 font-medium">{team.teamName}</h3>
                 <div className="space-y-1.5">
                   {team.players.map((player, playerIndex) => (
                     <div
                       key={player.id}
-                      className="flex items-center w-full gap-2"
+                      className={cn(
+                        "flex items-center w-full gap-2",
+                        activeId === player.id && "opacity-20",
+                      )}
                     >
                       <div className="bg-primary text-primary-foreground size-6 flex items-center justify-center rounded-md font-semibold shrink-0 mr-2">
                         {playerIndex + 1}
@@ -174,16 +180,23 @@ const PlayerPositionsPage = () => {
                   Neuen Spieler hinzufügen
                 </Button>
               </div>
-            </SortableContext>
-          );
-        })}
-        <Button
-          className="mt-8 w-full"
-          onClick={() => setTeamCount((prev) => prev + 1)}
-        >
-          <PlusSignIcon strokeWidth={2} />
-          Neue Mannschaft
-        </Button>
+            );
+          })}
+          <Button
+            className="mt-8 w-full"
+            onClick={() => setTeamCount((prev) => prev + 1)}
+          >
+            <PlusSignIcon strokeWidth={2} />
+            Neue Mannschaft
+          </Button>
+          <DragOverlay className="border rounded-sm bg-card flex items-center p-2 gap-2">
+            <DragDropVerticalIcon className="shrink-0" />
+            {
+              group.listPlayers().find((player) => player.id === activeId)
+                ?.fullName
+            }
+          </DragOverlay>
+        </SortableContext>
       </DndContext>
     </Layout>
   );
