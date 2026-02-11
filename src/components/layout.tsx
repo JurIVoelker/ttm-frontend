@@ -15,7 +15,12 @@ const Layout = ({
     <SidebarProvider>
       <Refresher />
       {!hideSidebar && <AppSidebar />}
-      <div className={cn("w-full min-h-screen max-w-screen")}>
+      <div
+        className={cn("w-full min-h-screen mx-auto", hideSidebar && "px-6")}
+        style={{
+          maxWidth: "min(100vw, 1200px)",
+        }}
+      >
         <Navbar menuHidden={hideSidebar} />
         <div className="px-6 pb-6 pt-16">{children}</div>
       </div>

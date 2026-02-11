@@ -16,6 +16,7 @@ const Refresher = () => {
       "mannschaften",
       "login",
       "benachrichtigungen",
+      "einstellungen",
     ];
     if (forbiddenSlugs.includes(newSlug)) {
       mainStore.getState().setTeamSlug(null);

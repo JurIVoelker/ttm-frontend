@@ -15,11 +15,9 @@ import { mainStore } from "@/store/main-store";
 import SidebarAllTeams from "./sidebar-all-teams";
 import SidebarOwnTeams from "./sidebar-own-teams";
 import {
-  AddTeamIcon,
-  ArrowReloadHorizontalIcon,
   Login02Icon,
   Notification01Icon,
-  ShieldUserIcon,
+  Settings01Icon,
   UserCircleIcon,
 } from "hugeicons-react";
 import { isAdmin, isLeader, isPlayer } from "@/lib/permission";
@@ -120,20 +118,9 @@ const AppSidebar = () => {
           )}
           {admin && (
             <>
-              <SidebarMenuButton onClick={() => navigate("/mannschaften")}>
-                <AddTeamIcon strokeWidth={2} />
-                Mannschaften
-              </SidebarMenuButton>
-              <SidebarMenuButton onClick={() => navigate("/admins")}>
-                <ShieldUserIcon strokeWidth={2} />
-                Admins verwalten
-              </SidebarMenuButton>
-              <SidebarMenuButton>
-                <ArrowReloadHorizontalIcon
-                  strokeWidth={2}
-                  onClick={() => navigate("/synchronisation")}
-                />
-                Synchronisation
+              <SidebarMenuButton onClick={() => navigate("/einstellungen")}>
+                <Settings01Icon strokeWidth={2} />
+                Konfiguration
               </SidebarMenuButton>
             </>
           )}

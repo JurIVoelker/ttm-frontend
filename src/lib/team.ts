@@ -1,6 +1,7 @@
 import { PlayersOfTeamDTO } from "@/types/player";
 import { TeamDTO, TeamPositionsDTO, TeamType } from "@/types/team";
 import { intToRoman } from "./romanUtils";
+import { mainStore } from "@/store/main-store";
 
 interface GroupedTeamPlayers {
   currentTeam?: TeamDTO;
@@ -44,6 +45,79 @@ export const groupPlayersToOtherTeams = ({ currentTeam, allPositions, teams }: G
   }
 
   return otherTeamPositions;
+}
+
+export const groupPlayersByTeam = (players: PlayersOfTeamDTO[], minLength?: number) => {
+  const groupedTeams: {
+    index: number;
+    teamName: string;
+    players: PlayersOfTeamDTO[];
+  }[] = [];
+
+  const sortedPlayers = players.sort((a, b) => {
+    const priorityA = a.position === undefined ? 0 : 1000 * a.position.teamIndex + a.position.position;
+    const priorityB = b.position === undefined ? 0 : 1000 * b.position.teamIndex + b.position.position;
+    return priorityA - priorityB;
+  })
+
+  const teams = mainStore.getState().teams;
+
+  let name = "Mannschaft";
+
+  for (let i = 0; i < sortedPlayers.length; i++) {
+    const player = sortedPlayers[i]
+    const existingEntry = groupedTeams.find(
+      (pos) => pos.index === player.position?.teamIndex,
+    );
+
+    if (name === "Mannschaft" && player.position?.teamType) {
+      name = translateTeamType(player.position.teamType);
+    }
+
+    if (existingEntry) {
+      existingEntry.players.push(player);
+      continue;
+    }
+
+
+    const missingTeamCount = player.position?.teamIndex ? player.position.teamIndex - groupedTeams.length : 0;
+    console.table({ missingTeamCount, i, player: player.fullName })
+    if (missingTeamCount > 1) {
+      for (let j = 1; j <= missingTeamCount; j++) {
+        groupedTeams.push({
+          index: i + j,
+          teamName: `${name} ${intToRoman(i + j)}`,
+          players: [],
+        });
+      }
+    }
+
+    const teamName =
+      teams.find(
+        (t) =>
+          t.type === player.position?.teamType &&
+          t.groupIndex === player.position?.teamIndex,
+      )?.name || `${name} ${intToRoman(player.position?.teamIndex || 0)}`;
+
+    groupedTeams.push({
+      index: player.position?.teamIndex || 0,
+      teamName,
+      players: [player],
+    });
+
+  }
+
+  if (minLength) {
+    for (let i = 1; i <= minLength - groupedTeams.length; i++) {
+      groupedTeams.push({
+        index: groupedTeams.length + 1 + i,
+        teamName: `${name} ${intToRoman(groupedTeams.length + 1)}`,
+        players: [],
+      });
+    }
+  }
+
+  return groupedTeams;
 }
 
 export const translateTeamType = (teamType: TeamType) => {
