@@ -25,7 +25,7 @@ const TeamPage = () => {
         element.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     }
-  }, [matchesResponse.isPending]);
+  }, [matchesResponse.isPending, matchesResponse.data]);
 
   const onSaveVote = async (availability: Availability, matchId: string) => {
     const playerId = authStore.getState().jwtDecoded?.player?.id;
