@@ -63,7 +63,9 @@ const PlayersCard = ({ players }: { players: PlayerOfTeamDTO[] }) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-wrap gap-2">
-        {players.length === 0 && <>test</>}
+        {players.length === 0 && (
+          <p className="text-muted-foreground text-sm">Keine Spieler</p>
+        )}
         {players?.map((p) => (
           <Badge
             key={p.id}
