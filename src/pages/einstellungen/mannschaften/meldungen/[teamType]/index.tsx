@@ -6,10 +6,12 @@ import { SortablePlayerItem } from "@/components/sort-players/sortable-item";
 import Title from "@/components/title";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useFetchPlayers } from "@/hooks/use-fetch/use-fetch-players";
 import { useFetchTeamPositions } from "@/hooks/use-fetch/use-fetch-team-positions";
 import { PlayerGroup } from "@/lib/player.sort";
 import { getTeamName } from "@/lib/team";
 import { cn } from "@/lib/utils";
+import { PlayerOfTeamDTO } from "@/types/player";
 import { TeamType } from "@/types/team";
 import {
   DndContext,
@@ -28,12 +30,15 @@ import {
 } from "@dnd-kit/sortable";
 import { DragDropVerticalIcon, PlusSignIcon } from "hugeicons-react";
 import { XIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const PlayerPositionsPage = () => {
   const { data, setData, isPending } = useFetchTeamPositions();
-
+  const playerData = useFetchPlayers();
+  const [teamCount, setTeamCount] = useState(0);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const pathName = usePathname();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -46,12 +51,15 @@ const PlayerPositionsPage = () => {
     }),
   );
 
-  const [teamCount, setTeamCount] = useState(0);
-
-  const targetTeamType =
-    typeof window !== "undefined"
-      ? (window.location.pathname.split("/").slice(-1)[0] as TeamType)
-      : "";
+  useEffect(() => {
+    const fragment = window.location.hash;
+    if (fragment) {
+      const element = document.querySelector(fragment);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  }, [pathName]);
 
   useEffect(() => {
     if (!isPending && data) {
@@ -64,6 +72,11 @@ const PlayerPositionsPage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPending]);
+
+  const targetTeamType =
+    typeof window !== "undefined"
+      ? (window.location.pathname.split("/").slice(-1)[0] as TeamType)
+      : "";
 
   const targetPlayers = data?.teams.find(
     (team) => team.teamType === targetTeamType,
@@ -79,6 +92,54 @@ const PlayerPositionsPage = () => {
   const onRemovePlayer = (playerId: string) => {
     group.removePlayer(playerId);
     setData(group.getStateValue(data?.teams));
+    const targetPlayer = playerData.data?.players.find(
+      (player) => player.id === playerId,
+    );
+    if (!targetPlayer) {
+      console.warn(
+        `Player with id ${playerId} not found. Cannot remove from team.`,
+      );
+      return;
+    }
+    targetPlayer.positions = targetPlayer.positions.filter(
+      (pos) => pos.teamType !== targetTeamType,
+    );
+    playerData.setData({
+      players: [
+        ...(playerData.data?.players.filter(
+          (player) => player.id !== playerId,
+        ) || []),
+        targetPlayer,
+      ],
+    });
+  };
+
+  const onAddPlayer = (player: PlayerOfTeamDTO) => {
+    if (!player.position) {
+      console.warn("Player has no position. Cannot be added to team.");
+      return;
+    }
+    if (!playerData.data) return;
+    group.removePlayer(player.id);
+    group.addPlayer(
+      player,
+      player.position.teamIndex,
+      player.position.position,
+    );
+
+    const playerDTO = {
+      id: player.id,
+      fullName: player.fullName,
+      positions: [player.position],
+    };
+
+    setData(group.getStateValue(data?.teams));
+    playerData.setData({
+      players: [
+        ...playerData.data.players.filter((p) => p.id !== player.id),
+        playerDTO,
+      ],
+    });
   };
 
   const group = new PlayerGroup({
@@ -86,6 +147,7 @@ const PlayerPositionsPage = () => {
     type: targetTeamType as TeamType,
     minLength: teamCount,
   });
+
   const groupedTeams = group.group;
 
   return (
@@ -136,8 +198,11 @@ const PlayerPositionsPage = () => {
                   </Droppable>
 
                   <AddPlayerDialog
-                    onAddPlayer={() => {}}
-                    teamGroups={data?.teams}
+                    onAddPlayer={onAddPlayer}
+                    teamIndex={index + 1}
+                    teamPosition={team.players.length + 1}
+                    allPlayers={playerData?.data?.players || []}
+                    targetTeamType={targetTeamType}
                   />
                 </div>
               );
@@ -182,8 +247,11 @@ const PlayerPositionsPage = () => {
                   ))}
                 </div>
                 <AddPlayerDialog
-                  onAddPlayer={() => {}}
-                  teamGroups={data?.teams}
+                  onAddPlayer={onAddPlayer}
+                  teamIndex={index + 1}
+                  teamPosition={team.players.length + 1}
+                  allPlayers={playerData?.data?.players || []}
+                  targetTeamType={targetTeamType}
                 />
               </div>
             );

@@ -24,6 +24,7 @@ export const SortablePlayerItem: React.FC<SortablePlayerItemProps> = ({
 
   return (
     <div
+      id={`player-${id}`}
       ref={setNodeRef}
       style={style}
       {...attributes}
