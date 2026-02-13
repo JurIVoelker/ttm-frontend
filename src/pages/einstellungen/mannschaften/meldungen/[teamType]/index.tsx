@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useFetchPlayers } from "@/hooks/use-fetch/use-fetch-players";
 import { useFetchTeamPositions } from "@/hooks/use-fetch/use-fetch-team-positions";
 import { sendRequest } from "@/lib/fetch-utils";
+import { showMessage } from "@/lib/message";
 import { PlayerGroup } from "@/lib/player.sort";
 import { getTeamName } from "@/lib/team";
 import { cn } from "@/lib/utils";
@@ -32,14 +33,17 @@ import {
 import { DragDropVerticalIcon, PlusSignIcon } from "hugeicons-react";
 import { XIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 const PlayerPositionsPage = () => {
-  const { data, setData, isPending } = useFetchTeamPositions();
-  const playerData = useFetchPlayers();
   const [teamCount, setTeamCount] = useState(0);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const { data, setData, isPending } = useFetchTeamPositions();
+  const playerData = useFetchPlayers();
   const pathName = usePathname();
+  const { push } = useRouter();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -143,6 +147,7 @@ const PlayerPositionsPage = () => {
   };
 
   const onSave = async () => {
+    setIsSaving(true);
     const response = await sendRequest({
       method: "PUT",
       path: "/api/players/types/positions/" + targetTeamType,
@@ -151,8 +156,17 @@ const PlayerPositionsPage = () => {
       },
     });
 
-    const json = await response.json();
-    console.log(json);
+    if (!response.ok) {
+      showMessage("Fehler beim Speichern der Meldungen.", {
+        variant: "error",
+      });
+      setIsSaving(false);
+      return;
+    }
+
+    showMessage("Meldungen erfolgreich gespeichert.");
+    push(`/einstellungen/mannschaften/meldungen`);
+    setIsSaving(false);
   };
 
   const group = new PlayerGroup({
@@ -172,7 +186,7 @@ const PlayerPositionsPage = () => {
       </p>
       <NavigationButtons
         onSave={onSave}
-        isSaving={false}
+        isSaving={isSaving}
         backNavigation="/einstellungen/mannschaften/meldungen"
       />
       {isPending && <LoadingState />}
