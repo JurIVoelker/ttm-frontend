@@ -1,14 +1,16 @@
+import AddPlayerDialog from "@/components/add-player-modal";
 import Layout from "@/components/layout";
 import NavigationButtons from "@/components/navigation-buttons";
 import { Droppable } from "@/components/sort-players/droppable";
 import { SortablePlayerItem } from "@/components/sort-players/sortable-item";
 import Title from "@/components/title";
 import { Button } from "@/components/ui/button";
-import { useFetchData } from "@/hooks/use-fetch-data";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useFetchTeamPositions } from "@/hooks/use-fetch/use-fetch-team-positions";
 import { PlayerGroup } from "@/lib/player.sort";
 import { getTeamName } from "@/lib/team";
 import { cn } from "@/lib/utils";
-import { TeamPositionsDTO, TeamType } from "@/types/team";
+import { TeamType } from "@/types/team";
 import {
   DndContext,
   DragOverEvent,
@@ -29,12 +31,7 @@ import { XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const PlayerPositionsPage = () => {
-  const { data, setData, loading } = useFetchData<{
-    teams: TeamPositionsDTO[];
-  }>({
-    method: "GET",
-    path: "/api/teams/types/positions",
-  });
+  const { data, setData, isPending } = useFetchTeamPositions();
 
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -57,7 +54,7 @@ const PlayerPositionsPage = () => {
       : "";
 
   useEffect(() => {
-    if (!loading && data) {
+    if (!isPending && data) {
       const indicies = data.teams
         .find((team) => team.teamType === targetTeamType)
         ?.players.flatMap((player) => player.position?.teamIndex)
@@ -66,7 +63,7 @@ const PlayerPositionsPage = () => {
       setTeamCount(maxIndex);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
+  }, [isPending]);
 
   const targetPlayers = data?.teams.find(
     (team) => team.teamType === targetTeamType,
@@ -101,8 +98,9 @@ const PlayerPositionsPage = () => {
       <NavigationButtons
         onSave={() => {}}
         isSaving={false}
-        backNavigation="/mannschaften"
+        backNavigation="/einstellungen/mannschaften/meldungen"
       />
+      {isPending && <LoadingState />}
       <DndContext
         onDragStart={(event) => setActiveId(String(event.active.id))}
         onDragEnd={() => setActiveId(null)}
@@ -137,10 +135,10 @@ const PlayerPositionsPage = () => {
                     Noch keine Spieler
                   </Droppable>
 
-                  <Button variant="outline" className="mt-3 w-full">
-                    <PlusSignIcon strokeWidth={2} />
-                    Neuen Spieler hinzufügen
-                  </Button>
+                  <AddPlayerDialog
+                    onAddPlayer={() => {}}
+                    teamGroups={data?.teams}
+                  />
                 </div>
               );
             return (
@@ -150,16 +148,24 @@ const PlayerPositionsPage = () => {
                   {team.players.map((player, playerIndex) => (
                     <div
                       key={player.id}
-                      className={cn(
-                        "flex items-center w-full gap-2",
-                        activeId === player.id && "opacity-20",
-                      )}
+                      className={cn("flex items-center w-full gap-2")}
                     >
-                      <div className="bg-primary text-primary-foreground size-6 flex items-center justify-center rounded-md font-semibold shrink-0 mr-2">
+                      <div
+                        className={cn(
+                          "bg-secondary text-secondary-foreground size-6 flex items-center justify-center rounded-md font-semibold shrink-0 mr-2",
+                          activeId === player.id &&
+                            "bg-primary text-primary-foreground",
+                        )}
+                      >
                         {playerIndex + 1}
                       </div>
                       <SortablePlayerItem id={player.id}>
-                        <div className="px-2 py-1.5 bg-secondary/40 active:bg-secondary hover:cursor-grab active:cursor-grabbing transition-colors rounded-md border w-full flex items-center gap-1.5">
+                        <div
+                          className={cn(
+                            "px-2 py-1.5 bg-secondary/40 active:bg-secondary hover:cursor-grab active:cursor-grabbing transition-colors rounded-md border w-full flex items-center gap-1.5",
+                            activeId === player.id && "opacity-20",
+                          )}
+                        >
                           <DragDropVerticalIcon className="shrink-0" />
                           {player.fullName}
                         </div>
@@ -175,10 +181,10 @@ const PlayerPositionsPage = () => {
                     </div>
                   ))}
                 </div>
-                <Button variant="outline" className="mt-1 w-full">
-                  <PlusSignIcon strokeWidth={2} />
-                  Neuen Spieler hinzufügen
-                </Button>
+                <AddPlayerDialog
+                  onAddPlayer={() => {}}
+                  teamGroups={data?.teams}
+                />
               </div>
             );
           })}
@@ -189,7 +195,7 @@ const PlayerPositionsPage = () => {
             <PlusSignIcon strokeWidth={2} />
             Neue Mannschaft
           </Button>
-          <DragOverlay className="border rounded-sm bg-card flex items-center p-2 gap-2">
+          <DragOverlay className="border rounded-sm flex items-center p-2 gap-1.5 bg-secondary">
             <DragDropVerticalIcon className="shrink-0" />
             {
               group.listPlayers().find((player) => player.id === activeId)
@@ -199,6 +205,17 @@ const PlayerPositionsPage = () => {
         </SortableContext>
       </DndContext>
     </Layout>
+  );
+};
+
+const LoadingState = () => {
+  return (
+    <>
+      {Array.from({ length: 3 }).map((_, index) => (
+        <Skeleton key={index} className="w-full h-60 rounded-md mb-6" />
+      ))}
+      <Skeleton className="w-full h-10 rounded-md mt-8" />
+    </>
   );
 };
 

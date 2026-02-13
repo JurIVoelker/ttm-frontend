@@ -11,7 +11,7 @@ import { jwtPayload } from "@/types/auth";
 import { decode } from "jsonwebtoken";
 import { formatDistanceStrict } from "date-fns";
 import { showMessage } from "./message";
-import { PlayersOfTeamDTO } from "@/types/player";
+import { PlayerOfTeamDTO } from "@/types/player";
 
 interface RequestParams {
   path: string;
@@ -51,7 +51,9 @@ export const sendRequest = async ({
       jwt = newJwt;
       renewResponse = response;
     } catch (error) {
-      window.location.pathname = "/login";
+      if (window.location.pathname !== "/login") {
+        window.location.pathname = "/login";
+      }
       console.error("Error renewing JWT:", error);
     }
   }
@@ -76,6 +78,15 @@ export const sendRequest = async ({
     });
   } catch (error) {
     console.error(`Error during fetch to ${path}:`, error);
+    if (error instanceof Error) {
+      console.log(error.message)
+      if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
+        showMessage(
+          "Verbindung fehlgeschlagen. Überprüfe deine Internetverbindung.",
+          { variant: "error" },
+        );
+      }
+    }
     throw error;
   }
 
@@ -179,7 +190,7 @@ export const fetchPlayersWithInviteToken = async (
 
   authStore.getState().setInviteToken(inviteToken);
 
-  const data = (await response.json()) as PlayersOfTeamDTO[];
+  const data = (await response.json()) as PlayerOfTeamDTO[];
   return data;
 };
 

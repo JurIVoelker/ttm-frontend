@@ -1,4 +1,4 @@
-import { PlayersOfTeamDTO } from "@/types/player";
+import { PlayerOfTeamDTO } from "@/types/player";
 import {
   Card,
   CardContent,
@@ -13,12 +13,12 @@ import { Copy01Icon, Login02Icon, PencilEdit02Icon } from "hugeicons-react";
 import { Badge } from "../ui/badge";
 import { mainStore } from "@/store/main-store";
 import Link from "next/link";
-import { useFetchData } from "@/hooks/use-fetch-data";
 import { showMessage } from "@/lib/message";
 import { useRouter } from "next/router";
 import LeaveTeamButton from "./leave-team";
+import useFetchInviteToken from "@/hooks/use-fetch/use-fetch-invite-token";
 
-const PlayersCard = ({ players }: { players: PlayersOfTeamDTO[] }) => {
+const PlayersCard = ({ players }: { players: PlayerOfTeamDTO[] }) => {
   const { authStore } = useAuthStore();
   const { teamSlug } = mainStore((state) => state);
   const { push } = useRouter();
@@ -30,11 +30,7 @@ const PlayersCard = ({ players }: { players: PlayersOfTeamDTO[] }) => {
   const showFooter = leaderOfTeam || playerOfTeam;
   const inviteLinkButtonVisible = leaderOfTeam || admin;
 
-  const inviteTokenResponse = useFetchData<{ inviteToken: string }>({
-    method: "GET",
-    path: `/api/team/${teamSlug}/inviteToken`,
-    ready: (leaderOfTeam || admin) && Boolean(teamSlug),
-  });
+  const inviteTokenResponse = useFetchInviteToken();
 
   const inviteToken = inviteTokenResponse.data?.inviteToken;
 
@@ -82,7 +78,7 @@ const PlayersCard = ({ players }: { players: PlayersOfTeamDTO[] }) => {
           {inviteLinkButtonVisible && (
             <Button
               className="w-full"
-              disabled={inviteTokenResponse.loading || !inviteToken}
+              disabled={inviteTokenResponse.isPending || !inviteToken}
               onClick={onCopyInviteToken}
             >
               <Copy01Icon strokeWidth={2} />

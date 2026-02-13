@@ -11,7 +11,7 @@ import {
   DrawerTrigger,
 } from "./ui/drawer";
 import { PlusSignIcon, Tick01Icon } from "hugeicons-react";
-import { PlayersOfTeamDTO } from "@/types/player";
+import { PlayerOfTeamDTO } from "@/types/player";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -19,10 +19,10 @@ interface ReplacementPlayerDrawerProps {
   teams: {
     index: number;
     teamName: string;
-    players: PlayersOfTeamDTO[];
+    players: PlayerOfTeamDTO[];
   }[];
-  onSelectPlayers: (players: PlayersOfTeamDTO[]) => void;
-  selectedPlayers: PlayersOfTeamDTO[];
+  onSelectPlayers: (players: PlayerOfTeamDTO[]) => void;
+  selectedPlayers: PlayerOfTeamDTO[];
   className?: string;
 }
 
@@ -32,7 +32,7 @@ const ReplacementPlayerDrawer: React.FC<ReplacementPlayerDrawerProps> = ({
   selectedPlayers,
   className,
 }) => {
-  const [players, setPlayers] = useState<PlayersOfTeamDTO[]>([]);
+  const [players, setPlayers] = useState<PlayerOfTeamDTO[]>([]);
 
   const selectedReplacementPlayers = selectedPlayers.filter((sp) =>
     teams.every((t) => t.players.every((p) => p.id !== sp.id)),

@@ -1,4 +1,4 @@
-import { PlayersOfTeamDTO } from "@/types/player";
+import { PlayerOfTeamDTO } from "@/types/player";
 import { Separator } from "./ui/separator";
 import { Fragment } from "react";
 import { Button } from "./ui/button";
@@ -6,15 +6,15 @@ import { XIcon } from "lucide-react";
 import { TeamPositionsDTO } from "@/types/team";
 
 interface PlayersTableProps {
-  players?: PlayersOfTeamDTO[];
+  players?: PlayerOfTeamDTO[];
   teams?: TeamPositionsDTO[];
-  onRemovePlayer: (player: PlayersOfTeamDTO) => void;
+  onRemovePlayer: (player: PlayerOfTeamDTO) => void;
 }
 
 interface PlayerTableItemProps {
-  player: PlayersOfTeamDTO;
+  player: PlayerOfTeamDTO;
   position: number;
-  onRemovePlayer: (player: PlayersOfTeamDTO) => void;
+  onRemovePlayer: (player: PlayerOfTeamDTO) => void;
 }
 
 const PlayersTable = (props: PlayersTableProps) => {

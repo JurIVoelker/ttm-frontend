@@ -234,7 +234,7 @@
   }
   25% {
     opacity: 0.9;
-    transform: scaleY(0.9) scaleX(var(--animate-scale-x));
+    transform: scaleY(0.88) scaleX(var(--animate-scale-x));
   }
   100% {
     opacity: 1;

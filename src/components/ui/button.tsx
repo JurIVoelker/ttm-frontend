@@ -77,6 +77,7 @@ function Button({
 
   const clickClass = isClicked ? "animate-click" : "";
   const Comp = asChild ? Slot : "button";
+  const xAnimationOffset = size?.startsWith("icon") ? 4 : 12;
 
   return (
     <Comp
@@ -88,7 +89,7 @@ function Button({
       onClick={onClickAnimated}
       style={
         {
-          "--animate-scale-x": (buttonWidth - 8) / buttonWidth,
+          "--animate-scale-x": (buttonWidth - xAnimationOffset) / buttonWidth,
         } as React.CSSProperties
       }
       {...props}

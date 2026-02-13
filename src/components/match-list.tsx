@@ -31,7 +31,7 @@ import {
 } from "@/lib/permission";
 import useAuthStore from "@/hooks/use-auth-store";
 import GameAvailabilityDialog from "./game-availability-dialog";
-import { PlayersOfTeamDTO } from "@/types/player";
+import { PlayerOfTeamDTO } from "@/types/player";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,7 +60,7 @@ import { authStore } from "@/store/auth-store";
 
 interface MatchListProps {
   matches: MatchesDTO;
-  allPlayers: PlayersOfTeamDTO[];
+  allPlayers: PlayerOfTeamDTO[];
 }
 
 const MatchList = ({
@@ -102,7 +102,7 @@ const MatchListItem = ({
   saveVote,
 }: {
   match: MatchDTO;
-  allPlayers: PlayersOfTeamDTO[];
+  allPlayers: PlayerOfTeamDTO[];
   saveVote: (availability: Availability, matchId: string) => Promise<void>;
 }) => {
   const { authStore } = useAuthStore();
@@ -145,7 +145,7 @@ const MatchCardHeader = ({
 }: {
   title: string;
   match: MatchDTO;
-  allPlayers: PlayersOfTeamDTO[];
+  allPlayers: PlayerOfTeamDTO[];
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -332,7 +332,7 @@ const MatchAvailability = ({
 }: {
   defaultValue?: Availability;
   votes: MatchAvailabilityVote[];
-  allPlayers: PlayersOfTeamDTO[];
+  allPlayers: PlayerOfTeamDTO[];
   matchId: string;
   saveVote: (availability: Availability) => Promise<void>;
 }) => {

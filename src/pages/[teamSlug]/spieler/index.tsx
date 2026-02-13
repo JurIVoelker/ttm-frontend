@@ -1,15 +1,14 @@
 import Layout from "@/components/layout";
 import NavigationButtons from "@/components/navigation-buttons";
 import Title from "@/components/title";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useFetchData } from "@/hooks/use-fetch-data";
+import { useFetchPlayersByTeamSlug } from "@/hooks/use-fetch/use-fetch-players-by-team-slug";
+import { useFetchTeamPositions } from "@/hooks/use-fetch/use-fetch-team-positions";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
 import { groupPlayersToOtherTeams } from "@/lib/team";
 import { cn } from "@/lib/utils";
 import { mainStore } from "@/store/main-store";
-import { PlayersOfTeamDTO } from "@/types/player";
-import { TeamPositionsDTO } from "@/types/team";
+import { PlayerOfTeamDTO } from "@/types/player";
 import { Tick01Icon } from "hugeicons-react";
 import { PlusIcon } from "lucide-react";
 import { useRouter } from "next/router";
@@ -19,20 +18,11 @@ const ManagePlayersPage = () => {
   const teamSlug = mainStore((state) => state.teamSlug);
   const teams = mainStore((state) => state.teams);
 
-  const playerResponse = useFetchData<{ players: PlayersOfTeamDTO[] }>({
-    method: "GET",
-    path: `/api/players/${teamSlug}`,
-    ready: Boolean(teamSlug),
-  });
+  const playerResponse = useFetchPlayersByTeamSlug();
 
-  const teamPositionsResponse = useFetchData<{ teams: TeamPositionsDTO[] }>({
-    method: "GET",
-    path: `/api/teams/types/positions`,
-  });
+  const teamPositionsResponse = useFetchTeamPositions();
 
-  const [selectedPlayers, setSelectedPlayers] = useState<PlayersOfTeamDTO[]>(
-    [],
-  );
+  const [selectedPlayers, setSelectedPlayers] = useState<PlayerOfTeamDTO[]>([]);
 
   const { push } = useRouter();
 
@@ -43,12 +33,6 @@ const ManagePlayersPage = () => {
       setSelectedPlayers(playerResponse.data.players);
     }
   }, [playerResponse.data]);
-
-  const loading = playerResponse.loading || teamPositionsResponse.loading;
-  const dataReceived =
-    !loading &&
-    playerResponse.data !== null &&
-    teamPositionsResponse.data !== null;
 
   const currentTeam = teams.find((t) => t.slug === teamSlug);
   const targetTeamType = teamPositionsResponse?.data?.teams?.find(
@@ -93,35 +77,29 @@ const ManagePlayersPage = () => {
       </p>
       <NavigationButtons
         onSave={onSaveSelection}
-        isSaving={isSaving || teamPositionsResponse.loading}
+        isSaving={isSaving || teamPositionsResponse.isPending}
       />
-      {loading ? (
-        <LoadingState />
-      ) : dataReceived ? (
-        <div className="pb-16 animate-pop-in-subtle">
-          <div className="space-y-4 md:mt-6">
+      <div className="pb-16 animate-pop-in-subtle">
+        <div className="space-y-4 md:mt-6">
+          <TeamPositionsCard
+            players={targetTeamPositions}
+            selectedPlayers={selectedPlayers}
+            title="Vorgeschlagene Spieler"
+            setSelectedPlayers={setSelectedPlayers}
+            variant="highlighted"
+            className="mt-1"
+          />
+          {otherTeams.map((otp) => (
             <TeamPositionsCard
-              players={targetTeamPositions}
+              players={otp.players}
               selectedPlayers={selectedPlayers}
-              title="Vorgeschlagene Spieler"
+              title={otp.teamName}
               setSelectedPlayers={setSelectedPlayers}
-              variant="highlighted"
-              className="mt-1"
+              key={otp.index}
             />
-            {otherTeams.map((otp) => (
-              <TeamPositionsCard
-                players={otp.players}
-                selectedPlayers={selectedPlayers}
-                title={otp.teamName}
-                setSelectedPlayers={setSelectedPlayers}
-                key={otp.index}
-              />
-            ))}
-          </div>
+          ))}
         </div>
-      ) : (
-        <>Fehler beim Laden</>
-      )}
+      </div>
     </Layout>
   );
 };
@@ -136,11 +114,11 @@ const TeamPositionsCard = ({
   ...props
 }: {
   variant?: "default" | "highlighted";
-  players?: PlayersOfTeamDTO[];
+  players?: PlayerOfTeamDTO[];
   title?: string;
   className?: string;
-  selectedPlayers: PlayersOfTeamDTO[];
-  setSelectedPlayers: Dispatch<SetStateAction<PlayersOfTeamDTO[]>>;
+  selectedPlayers: PlayerOfTeamDTO[];
+  setSelectedPlayers: Dispatch<SetStateAction<PlayerOfTeamDTO[]>>;
 }) => {
   if (!players || players.length === 0) return <></>;
 
@@ -179,7 +157,7 @@ const TeamPositionsCard = ({
                   "bg-primary text-primary-foreground border-primary",
               )}
               onClick={() => {
-                setSelectedPlayers((prev: PlayersOfTeamDTO[]) => {
+                setSelectedPlayers((prev: PlayerOfTeamDTO[]) => {
                   if (isSelected) {
                     return prev.filter((sp) => sp.id !== p.id);
                   } else {
@@ -208,17 +186,6 @@ const TeamPositionsCard = ({
         })}
       </div>
     </div>
-  );
-};
-
-const LoadingState = () => {
-  return (
-    <>
-      <Skeleton className="w-full h-70 mt-6" />
-      <Skeleton className="w-full h-70 mt-4" />
-      <Skeleton className="w-full h-70 mt-4" />
-      <Skeleton className="w-full h-70 mt-4" />
-    </>
   );
 };
 

@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { HelpCircleIcon, Info } from "lucide-react";
 import { Cancel01Icon, Tick01Icon } from "hugeicons-react";
 import { Badge } from "./ui/badge";
-import { PlayersOfTeamDTO } from "@/types/player";
+import { PlayerOfTeamDTO } from "@/types/player";
 import { MatchAvailabilityVote } from "@/types/match";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 
@@ -13,7 +13,7 @@ const GameAvailabilityDialog = ({
   allPlayers,
 }: {
   votes: MatchAvailabilityVote[];
-  allPlayers: PlayersOfTeamDTO[];
+  allPlayers: PlayerOfTeamDTO[];
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 

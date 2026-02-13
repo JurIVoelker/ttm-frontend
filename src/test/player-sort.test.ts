@@ -1,8 +1,8 @@
 import { PlayerGroup } from "@/lib/player.sort";
-import { PlayersOfTeamDTO } from "@/types/player";
+import { PlayerOfTeamDTO } from "@/types/player";
 import { expect, test } from "bun:test"
 
-const getPlayer = ({ pos, teamIndex }: { pos: number, teamIndex: number }): PlayersOfTeamDTO => {
+const getPlayer = ({ pos, teamIndex }: { pos: number, teamIndex: number }): PlayerOfTeamDTO => {
   const playerId = Bun.randomUUIDv7();
   return {
     fullName: `Player ${teamIndex}-${pos}`,

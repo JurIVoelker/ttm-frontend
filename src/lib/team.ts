@@ -1,4 +1,4 @@
-import { PlayersOfTeamDTO } from "@/types/player";
+import { PlayerOfTeamDTO } from "@/types/player";
 import { TeamDTO, TeamPositionsDTO, TeamType } from "@/types/team";
 import { intToRoman } from "./romanUtils";
 import { mainStore } from "@/store/main-store";
@@ -17,7 +17,7 @@ export const groupPlayersToOtherTeams = ({ currentTeam, allPositions, teams }: G
   const otherTeamPositions: {
     index: number;
     teamName: string;
-    players: PlayersOfTeamDTO[];
+    players: PlayerOfTeamDTO[];
   }[] = [];
 
   for (const position of targetTeamType?.players || []) {
@@ -47,11 +47,11 @@ export const groupPlayersToOtherTeams = ({ currentTeam, allPositions, teams }: G
   return otherTeamPositions;
 }
 
-export const groupPlayersByTeam = (players: PlayersOfTeamDTO[], minLength?: number) => {
+export const groupPlayersByTeam = (players: PlayerOfTeamDTO[], minLength?: number) => {
   const groupedTeams: {
     index: number;
     teamName: string;
-    players: PlayersOfTeamDTO[];
+    players: PlayerOfTeamDTO[];
   }[] = [];
 
   const sortedPlayers = players.sort((a, b) => {

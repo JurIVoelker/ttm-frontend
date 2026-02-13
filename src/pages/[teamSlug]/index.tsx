@@ -2,13 +2,11 @@ import Layout from "@/components/layout";
 import MatchList from "@/components/match-list";
 import PlayersCard from "@/components/players-card/players-card";
 import Title from "@/components/title";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useFetchData } from "@/hooks/use-fetch-data";
+import useFetchMatchesByTeamSlug from "@/hooks/use-fetch/use-fetch-matches-by-team-slug";
+import { useFetchPlayersByTeamSlug } from "@/hooks/use-fetch/use-fetch-players-by-team-slug";
 import { authStore } from "@/store/auth-store";
 import { mainStore } from "@/store/main-store";
-import { Availability, MatchesDTO } from "@/types/match";
-import { PlayersOfTeamDTO } from "@/types/player";
+import { Availability } from "@/types/match";
 import { useEffect } from "react";
 
 const TeamPage = () => {
@@ -16,17 +14,8 @@ const TeamPage = () => {
   const teams = mainStore((state) => state.teams);
   const team = teams.find((t) => t.slug === teamSlug);
 
-  const playerResponse = useFetchData<{ players: PlayersOfTeamDTO[] }>({
-    method: "GET",
-    path: `/api/players/${teamSlug}`,
-    ready: Boolean(teamSlug),
-  });
-
-  const matchesResponse = useFetchData<MatchesDTO>({
-    method: "GET",
-    path: `/api/matches/${teamSlug}`,
-    ready: Boolean(teamSlug),
-  });
+  const playerResponse = useFetchPlayersByTeamSlug();
+  const matchesResponse = useFetchMatchesByTeamSlug();
 
   useEffect(() => {
     const fragment = window.location.hash;
@@ -36,7 +25,7 @@ const TeamPage = () => {
         element.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     }
-  }, [matchesResponse.loading]);
+  }, [matchesResponse.isPending]);
 
   const onSaveVote = async (availability: Availability, matchId: string) => {
     const playerId = authStore.getState().jwtDecoded?.player?.id;
@@ -60,37 +49,16 @@ const TeamPage = () => {
 
   return (
     <Layout>
-      {playerResponse.loading ? (
-        <LoadingState />
-      ) : playerResponse.data !== null && !playerResponse.loading ? (
-        <div className="space-y-6">
-          <Title className="animate-pop-in-subtle">{team?.name}</Title>
-          <PlayersCard players={playerResponse.data.players} />
-          <MatchList
-            matches={matchesResponse.data || []}
-            allPlayers={playerResponse?.data?.players || []}
-            saveVote={onSaveVote}
-          />
-        </div>
-      ) : (
-        <>Nicht gefunden</>
-      )}
-    </Layout>
-  );
-};
-
-const LoadingState = () => {
-  return (
-    <>
-      <Skeleton className="w-full h-8" />
-      <Separator className="mt-2 w-full" />
-      <Skeleton className="w-full h-56 mt-6" />
-      <div className="space-y-4 pb-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 md:space-y-0 mt-6">
-        {Array.from({ length: 10 }).map((_, index) => (
-          <Skeleton key={index} className="w-full h-106" />
-        ))}
+      <div className="space-y-6">
+        <Title className="animate-pop-in-subtle">{team?.name}</Title>
+        <PlayersCard players={playerResponse?.data?.players || []} />
+        <MatchList
+          matches={matchesResponse.data || []}
+          allPlayers={playerResponse?.data?.players || []}
+          saveVote={onSaveVote}
+        />
       </div>
-    </>
+    </Layout>
   );
 };
 

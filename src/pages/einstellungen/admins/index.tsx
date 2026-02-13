@@ -2,16 +2,16 @@ import AddAdminModal from "@/components/add-admin-modal";
 import Layout from "@/components/layout";
 import Title from "@/components/title";
 import { Button } from "@/components/ui/button";
-import { useFetchData } from "@/hooks/use-fetch-data";
+import { useFetchAdmins } from "@/hooks/use-fetch/use-fetch-admins";
 import { Admin } from "@/types/admin";
-import { PlusSignIcon } from "hugeicons-react";
+import { ArrowLeft01Icon, PlusSignIcon } from "hugeicons-react";
 import { User2, XIcon } from "lucide-react";
+import { useRouter } from "next/router";
 
 const AdminsPage = () => {
-  const { data: admins, setData: setAdmins } = useFetchData<Admin[]>({
-    method: "GET",
-    path: `/api/admins`,
-  });
+  const { data: admins, setData: setAdmins } = useFetchAdmins();
+
+  const { push } = useRouter();
 
   const onAdd = (admin: Admin) => {
     setAdmins([...(admins || []), admin]);
@@ -20,7 +20,14 @@ const AdminsPage = () => {
   return (
     <Layout>
       <Title>Admins</Title>
-      <div className="space-y-4 mt-6">
+      <Button
+        variant="outline"
+        className="mt-6"
+        onClick={() => push("/einstellungen")}
+      >
+        <ArrowLeft01Icon /> Zurück
+      </Button>
+      <div className="space-y-4 mt-8">
         {admins?.map((a) => (
           <div
             key={a.id}

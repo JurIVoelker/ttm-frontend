@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { SingleMatchDTO } from "@/types/match";
-import { PlayersOfTeamDTO } from "@/types/player";
+import { PlayerOfTeamDTO } from "@/types/player";
 import { Tick01Icon } from "hugeicons-react";
 import { PlusIcon, XIcon } from "lucide-react";
 import { Badge } from "./ui/badge";
@@ -13,9 +13,9 @@ const LineupSelection = ({
   onRemovePlayer,
 }: {
   match?: SingleMatchDTO | null;
-  players?: PlayersOfTeamDTO[];
-  onSelectPlayer: (player: PlayersOfTeamDTO) => void;
-  onRemovePlayer: (player: PlayersOfTeamDTO) => void;
+  players?: PlayerOfTeamDTO[];
+  onSelectPlayer: (player: PlayerOfTeamDTO) => void;
+  onRemovePlayer: (player: PlayerOfTeamDTO) => void;
 }) => {
   const replacementPlayers = match?.lineup?.filter((lp) =>
     players?.every((p) => p.id !== lp.id),

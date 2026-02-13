@@ -7,10 +7,9 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
-import { useFetchData } from "@/hooks/use-fetch-data";
+import useFetchLeaders from "@/hooks/use-fetch/use-fetch-leaders";
 import { cn } from "@/lib/utils";
 import { mainStore } from "@/store/main-store";
-import { LeaderDTO } from "@/types/leader";
 import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
@@ -22,10 +21,7 @@ import { useState } from "react";
 
 const LeaderPage = () => {
   const teams = mainStore((state) => state.teams);
-  const leaderFetch = useFetchData<LeaderDTO[]>({
-    method: "GET",
-    path: "/api/leaders",
-  });
+  const leaderFetch = useFetchLeaders();
   const [openCollapsible, setOpenCollapsible] = useState<string | null>(null);
   const { back } = useRouter();
 

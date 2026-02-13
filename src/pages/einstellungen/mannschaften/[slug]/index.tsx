@@ -3,9 +3,9 @@ import NavigationButtons from "@/components/navigation-buttons";
 import { SortablePlayerItem } from "@/components/sort-players/sortable-item";
 import Title from "@/components/title";
 import { Button } from "@/components/ui/button";
-import { useFetchData } from "@/hooks/use-fetch-data";
+import useFetchLeaders from "@/hooks/use-fetch/use-fetch-leaders";
+import { useFetchTeamPositions } from "@/hooks/use-fetch/use-fetch-team-positions";
 import { mainStore } from "@/store/main-store";
-import { LeaderDTO } from "@/types/leader";
 import { TeamDTO, TeamPositionsDTO } from "@/types/team";
 import {
   closestCenter,
@@ -34,17 +34,9 @@ const EditTeamPage = () => {
     setTeam(team);
   }, []);
 
-  const { data, loading, setData } = useFetchData<{
-    teams: TeamPositionsDTO[];
-  }>({
-    method: "GET",
-    path: "/api/teams/types/positions",
-  });
+  const { data, setData } = useFetchTeamPositions();
 
-  const leaderFetch = useFetchData<LeaderDTO[]>({
-    method: "GET",
-    path: "/api/leaders",
-  });
+  const leaderFetch = useFetchLeaders();
 
   const [isSaving, setIsSaving] = useState(false);
 

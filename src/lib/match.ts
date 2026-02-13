@@ -1,5 +1,5 @@
 import { MatchDTO } from "@/types/match";
-import { PlayersOfTeamDTO } from "@/types/player";
+import { PlayerOfTeamDTO } from "@/types/player";
 import { format } from "date-fns";
 
 export const getWeekdayName = (date: Date) => {
@@ -10,7 +10,7 @@ export const getWeekdayName = (date: Date) => {
 
 export const getInfoTextString = (
   match: MatchDTO,
-  players: PlayersOfTeamDTO[],
+  players: PlayerOfTeamDTO[],
 ) => {
   if (
     !match?.time ||

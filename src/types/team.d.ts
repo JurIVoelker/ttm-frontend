@@ -1,4 +1,4 @@
-import { PlayersOfTeamDTO } from "./player";
+import { PlayerOfTeamDTO } from "./player";
 
 export type TeamDTO = {
   name: string;
@@ -19,5 +19,5 @@ export type TeamType =
 
 export type TeamPositionsDTO = {
   teamType: TeamType;
-  players: PlayersOfTeamDTO[];
+  players: PlayerOfTeamDTO[];
 };

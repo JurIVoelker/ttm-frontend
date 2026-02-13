@@ -9,32 +9,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useFetchData } from "@/hooks/use-fetch-data";
+import useFetchLeaders from "@/hooks/use-fetch/use-fetch-leaders";
+import { useFetchTeamPositions } from "@/hooks/use-fetch/use-fetch-team-positions";
 import { getTeamName } from "@/lib/team";
 import { mainStore } from "@/store/main-store";
-import { LeaderDTO } from "@/types/leader";
-import { TeamPositionsDTO } from "@/types/team";
 import { ArrowReloadHorizontalIcon, PlusSignIcon } from "hugeicons-react";
 import { useRouter } from "next/router";
 
 const Mannschaften = () => {
-  const { data, loading } = useFetchData<{
-    teams: TeamPositionsDTO[];
-  }>({
-    method: "GET",
-    path: "/api/teams/types/positions",
-  });
-
-  const leaderFetch = useFetchData<LeaderDTO[]>({
-    method: "GET",
-    path: "/api/leaders",
-  });
+  const { data } = useFetchTeamPositions();
+  const leaderFetch = useFetchLeaders();
 
   const { push } = useRouter();
-
-  if (loading || leaderFetch.loading) return <LoadingState />;
 
   return (
     <Layout>
@@ -147,22 +133,5 @@ const Mannschaften = () => {
     </Layout>
   );
 };
-
-const LoadingState = () => (
-  <Layout>
-    <Skeleton className="h-8 w-full mb-2" />
-    <Separator />
-    <Skeleton className="h-9 w-full mb-2 mt-8" />
-    <Skeleton className="h-9 w-full mb-2 mt-2" />
-    <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 lg:grid-cols-3 mt-6 md:space-y-0">
-      <Skeleton className="h-80 w-full" />
-      <Skeleton className="h-80 w-full" />
-      <Skeleton className="h-80 w-full" />
-      <Skeleton className="h-80 w-full" />
-      <Skeleton className="h-80 w-full" />
-      <Skeleton className="h-80 w-full" />
-    </div>
-  </Layout>
-);
 
 export default Mannschaften;

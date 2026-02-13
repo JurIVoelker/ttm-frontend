@@ -1,4 +1,4 @@
-import { PlayersOfTeamDTO } from "@/types/player";
+import { PlayerOfTeamDTO } from "@/types/player";
 import { TeamPositionsDTO, TeamType } from "@/types/team";
 import { intToRoman } from "./romanUtils";
 import { translateTeamType } from "./team";
@@ -9,12 +9,12 @@ export class PlayerGroup {
   public group: {
     index: number;
     teamName: string;
-    players: PlayersOfTeamDTO[];
+    players: PlayerOfTeamDTO[];
   }[] = []
 
   private type: TeamType;
 
-  public constructor({ players, minLength, type }: { players: PlayersOfTeamDTO[], minLength?: number, type: TeamType }) {
+  public constructor({ players, minLength, type }: { players: PlayerOfTeamDTO[], minLength?: number, type: TeamType }) {
     this.type = type;
     const filteredPlayers = players.filter((player) => player.position?.teamType === type)
     if (filteredPlayers.length !== players.length) {
@@ -52,7 +52,7 @@ export class PlayerGroup {
     this.recalculatePositions();
   }
 
-  public addPlayer(player: PlayersOfTeamDTO, teamIndex: number, position: number) {
+  public addPlayer(player: PlayerOfTeamDTO, teamIndex: number, position: number) {
     const team = this.group.find((t) => t.index === teamIndex);
     if (!team) {
       console.warn(`Team with index ${teamIndex} not found. Player not added.`);

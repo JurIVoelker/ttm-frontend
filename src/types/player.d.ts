@@ -1,6 +1,6 @@
 import { TeamType } from "./team";
 
-export type PlayersOfTeamDTO = {
+export type PlayerOfTeamDTO = {
   id: string;
   fullName: string;
   position?: {

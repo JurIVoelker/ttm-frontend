@@ -4,15 +4,15 @@ import NavigationButtons from "@/components/navigation-buttons";
 import ReplacementPlayerDrawer from "@/components/replacement-player-drawer";
 import Title from "@/components/title";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useFetchData } from "@/hooks/use-fetch-data";
+import useFetchMatchById from "@/hooks/use-fetch/use-fetch-match-by-id";
+import { useFetchPlayersByTeamSlug } from "@/hooks/use-fetch/use-fetch-players-by-team-slug";
+import { useFetchTeamPositions } from "@/hooks/use-fetch/use-fetch-team-positions";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
 import { groupPlayersToOtherTeams } from "@/lib/team";
 import { mainStore } from "@/store/main-store";
 import { SingleMatchDTO } from "@/types/match";
-import { PlayersOfTeamDTO } from "@/types/player";
-import { TeamPositionsDTO } from "@/types/team";
+import { PlayerOfTeamDTO } from "@/types/player";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -25,22 +25,9 @@ const LineupPage = () => {
   const [loading, setLoading] = useState(false);
   const { push } = useRouter();
 
-  const match = useFetchData<SingleMatchDTO>({
-    method: "GET",
-    path: `/api/matches/${teamSlug}/${matchId}`,
-    ready: Boolean(matchId && teamSlug),
-  });
-
-  const players = useFetchData<{ players: PlayersOfTeamDTO[] }>({
-    method: "GET",
-    path: `/api/players/${teamSlug}`,
-    ready: Boolean(teamSlug),
-  });
-
-  const teamPositions = useFetchData<{ teams: TeamPositionsDTO[] }>({
-    method: "GET",
-    path: `/api/teams/types/positions`,
-  });
+  const match = useFetchMatchById({ matchId });
+  const players = useFetchPlayersByTeamSlug();
+  const teamPositions = useFetchTeamPositions();
 
   const lineup = match.data?.lineup || [];
 
@@ -51,7 +38,7 @@ const LineupPage = () => {
   });
 
   const onSelectPlayerReplacementPlayers = (
-    selectedPlayers: PlayersOfTeamDTO[],
+    selectedPlayers: PlayerOfTeamDTO[],
   ) => {
     match.setData({
       ...match.data,
@@ -59,14 +46,14 @@ const LineupPage = () => {
     } as SingleMatchDTO);
   };
 
-  const onRemovePlayer = (player: PlayersOfTeamDTO) => {
+  const onRemovePlayer = (player: PlayerOfTeamDTO) => {
     match.setData({
       ...match.data,
       lineup: lineup?.filter((lp) => lp.id !== player.id) || [],
     } as SingleMatchDTO);
   };
 
-  const onSelectPlayer = (player: PlayersOfTeamDTO) => {
+  const onSelectPlayer = (player: PlayerOfTeamDTO) => {
     const isSelected = lineup?.some((lp) => lp.id === player.id);
     if (isSelected) {
       onRemovePlayer(player);
@@ -115,17 +102,10 @@ const LineupPage = () => {
       </div>
       <NavigationButtons
         onSave={onSave}
-        isSaving={loading || match.loading}
+        isSaving={loading || match.isPending}
         className="mt-2"
         backNavigation={`/${teamSlug}#match-card-${matchId}`}
       />
-      {match.loading && (
-        <div className="space-y-2">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="w-full h-9" />
-          ))}
-        </div>
-      )}
       <LineupSelection
         match={match.data}
         players={players.data?.players}

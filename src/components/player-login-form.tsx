@@ -4,7 +4,7 @@ import {
 } from "@/constants/error";
 import useAuthStore from "@/hooks/use-auth-store";
 import { mainStore } from "@/store/main-store";
-import { PlayersOfTeamDTO } from "@/types/player";
+import { PlayerOfTeamDTO } from "@/types/player";
 import { useEffect, useState } from "react";
 import {
   Card,
@@ -33,7 +33,7 @@ import { Skeleton } from "./ui/skeleton";
 const PlayerLogin = () => {
   const teamSlug = mainStore((state) => state.teamSlug);
   const authStore = useAuthStore();
-  const [players, setPlayers] = useState<PlayersOfTeamDTO[] | null>(null);
+  const [players, setPlayers] = useState<PlayerOfTeamDTO[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -110,7 +110,7 @@ const PlayerLogin = () => {
   );
 };
 
-const PlayerLoginForm = ({ players }: { players: PlayersOfTeamDTO[] }) => {
+const PlayerLoginForm = ({ players }: { players: PlayerOfTeamDTO[] }) => {
   const [loading, setLoading] = useState(false);
   const { push } = useRouter();
 
