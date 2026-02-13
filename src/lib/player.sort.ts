@@ -1,4 +1,4 @@
-import { PlayerOfTeamDTO } from "@/types/player";
+import { PlayerDTO, PlayerOfTeamDTO } from "@/types/player";
 import { TeamPositionsDTO, TeamType } from "@/types/team";
 import { intToRoman } from "./romanUtils";
 import { translateTeamType } from "./team";
@@ -115,6 +115,17 @@ export class PlayerGroup {
 
   public listPlayers() {
     return this.group.flatMap((t) => t.players);
+  }
+
+  public listDTOPlayers() {
+    return this.group.flatMap((t) => t.players).map(
+      (player) =>
+        ({
+          id: player.id,
+          fullName: player.fullName,
+          positions: [player.position],
+        }) as PlayerDTO,
+    );
   }
 
   public json() {

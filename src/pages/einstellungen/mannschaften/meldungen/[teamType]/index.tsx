@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFetchPlayers } from "@/hooks/use-fetch/use-fetch-players";
 import { useFetchTeamPositions } from "@/hooks/use-fetch/use-fetch-team-positions";
+import { sendRequest } from "@/lib/fetch-utils";
 import { PlayerGroup } from "@/lib/player.sort";
 import { getTeamName } from "@/lib/team";
 import { cn } from "@/lib/utils";
@@ -141,6 +142,19 @@ const PlayerPositionsPage = () => {
     });
   };
 
+  const onSave = async () => {
+    const response = await sendRequest({
+      method: "PUT",
+      path: "/api/players/types/positions/" + targetTeamType,
+      body: {
+        players: group.listDTOPlayers(),
+      },
+    });
+
+    const json = await response.json();
+    console.log(json);
+  };
+
   const group = new PlayerGroup({
     players: targetPlayers || [],
     type: targetTeamType as TeamType,
@@ -157,7 +171,7 @@ const PlayerPositionsPage = () => {
         die jeweiligen Mannschaften.
       </p>
       <NavigationButtons
-        onSave={() => {}}
+        onSave={onSave}
         isSaving={false}
         backNavigation="/einstellungen/mannschaften/meldungen"
       />
