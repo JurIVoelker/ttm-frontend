@@ -83,7 +83,6 @@ const PlayerPositionsPage = () => {
   )?.players;
 
   const onDragOver = (event: DragOverEvent) => {
-    console.log("onDragOver");
     const { active, over } = event;
     group.movePlayer({ activeId: active.id, overId: over?.id });
     setData(group.getStateValue(data?.teams || []));
@@ -258,7 +257,11 @@ const PlayerPositionsPage = () => {
           })}
           <Button
             className="mt-8 w-full"
-            onClick={() => setTeamCount((prev) => prev + 1)}
+            onClick={() =>
+              setTeamCount((prev) =>
+                Math.max(prev + 1, groupedTeams.length + 1),
+              )
+            }
           >
             <PlusSignIcon strokeWidth={2} />
             Neue Mannschaft
