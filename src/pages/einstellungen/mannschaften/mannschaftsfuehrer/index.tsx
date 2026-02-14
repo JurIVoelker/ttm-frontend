@@ -1,4 +1,5 @@
 import AddLeaderModal from "@/components/add-leader-modal";
+import ConfirmDialog from "@/components/confirm-dialog";
 import Layout from "@/components/layout";
 import Title from "@/components/title";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
 import { cn } from "@/lib/utils";
 import { mainStore } from "@/store/main-store";
+import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
 import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
@@ -27,6 +29,9 @@ const LeaderPage = () => {
   const leaderFetch = useFetchLeaders();
   const [openCollapsible, setOpenCollapsible] = useState<string | null>(null);
   const { back } = useRouter();
+  const [openConfirmDialog, setOpenConfirmDialog] = useState<null | string>(
+    null,
+  );
 
   const onAddLeader = () => {
     leaderFetch.refetch();
@@ -105,13 +110,21 @@ const LeaderPage = () => {
                       className="w-full flex justify-between items-center"
                     >
                       {leader.fullName}
-                      <Button
-                        variant="destructive"
-                        size="icon-sm"
-                        onClick={() => onRemoveLeader(leader.id, team.slug)}
+                      <ConfirmDialog
+                        title="Löschen"
+                        description="Möchstest du den Mannschaftsführer wirklich löschen?"
+                        onConfirm={() => onRemoveLeader(leader.id, team.slug)}
+                        open={openConfirmDialog === leader.id}
+                        setOpen={(open) =>
+                          setOpenConfirmDialog(open ? leader.id : null)
+                        }
                       >
-                        <X />
-                      </Button>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="icon-sm">
+                            <X />
+                          </Button>
+                        </AlertDialogTrigger>
+                      </ConfirmDialog>
                     </div>
                   ))}
                 <AddLeaderModal onAdd={onAddLeader} teamSlug={team.slug}>
