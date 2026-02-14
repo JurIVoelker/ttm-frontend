@@ -1,3 +1,4 @@
+import AddLeaderModal from "@/components/add-leader-modal";
 import Layout from "@/components/layout";
 import Title from "@/components/title";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,8 @@ import {
 } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
 import useFetchLeaders from "@/hooks/use-fetch/use-fetch-leaders";
+import { sendRequest } from "@/lib/fetch-utils";
+import { showMessage } from "@/lib/message";
 import { cn } from "@/lib/utils";
 import { mainStore } from "@/store/main-store";
 import {
@@ -24,6 +27,34 @@ const LeaderPage = () => {
   const leaderFetch = useFetchLeaders();
   const [openCollapsible, setOpenCollapsible] = useState<string | null>(null);
   const { back } = useRouter();
+
+  const onAddLeader = () => {
+    leaderFetch.refetch();
+  };
+
+  const onRemoveLeader = async (leaderId: string, teamSlug: string) => {
+    const prevState = leaderFetch.data;
+    const newLeaderData = leaderFetch.data?.filter(
+      (leader) => leader.id !== leaderId,
+    );
+    leaderFetch.setData(newLeaderData || []);
+
+    const res = await sendRequest({
+      path: `/api/leader/${teamSlug}`,
+      method: "DELETE",
+      body: {
+        id: leaderId,
+      },
+    });
+
+    if (!res.ok) {
+      showMessage("Fehler beim Entfernen des Mannschaftsführers", {
+        variant: "error",
+      });
+      leaderFetch.setData(prevState || []);
+      return;
+    }
+  };
 
   return (
     <Layout>
@@ -74,15 +105,21 @@ const LeaderPage = () => {
                       className="w-full flex justify-between items-center"
                     >
                       {leader.fullName}
-                      <Button variant="destructive" size="icon-sm">
+                      <Button
+                        variant="destructive"
+                        size="icon-sm"
+                        onClick={() => onRemoveLeader(leader.id, team.slug)}
+                      >
                         <X />
                       </Button>
                     </div>
                   ))}
-                <Button className="w-full" variant="outline">
-                  <PlusSignIcon strokeWidth={2} />
-                  Hinzufügen
-                </Button>
+                <AddLeaderModal onAdd={onAddLeader} teamSlug={team.slug}>
+                  <Button className="w-full" variant="outline">
+                    <PlusSignIcon strokeWidth={2} />
+                    Hinzufügen
+                  </Button>
+                </AddLeaderModal>
               </div>
             </CollapsibleContent>
           </Collapsible>
