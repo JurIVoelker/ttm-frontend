@@ -1,20 +1,42 @@
 import AddAdminModal from "@/components/add-admin-modal";
+import ConfirmDialog from "@/components/confirm-dialog";
 import Layout from "@/components/layout";
 import Title from "@/components/title";
+import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useFetchAdmins } from "@/hooks/use-fetch/use-fetch-admins";
+import { sendRequest } from "@/lib/fetch-utils";
 import { Admin } from "@/types/admin";
 import { ArrowLeft01Icon, PlusSignIcon } from "hugeicons-react";
-import { User2, XIcon } from "lucide-react";
+import { User2, X } from "lucide-react";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 const AdminsPage = () => {
   const { data: admins, setData: setAdmins } = useFetchAdmins();
+  const [openConfirmDialog, setOpenConfirmDialog] = useState<null | string>(
+    null,
+  );
 
   const { push } = useRouter();
 
   const onAdd = (admin: Admin) => {
     setAdmins([...(admins || []), admin]);
+  };
+
+  const onRemoveAdmin = async (adminId: string) => {
+    const prevState = admins;
+    setAdmins(admins?.filter((a) => a.id !== adminId) || []);
+
+    const response = await sendRequest({
+      method: "DELETE",
+      path: `/api/admins/${adminId}`,
+    });
+
+    if (!response.ok) {
+      setAdmins(prevState || []);
+      return;
+    }
   };
 
   return (
@@ -44,9 +66,19 @@ const AdminsPage = () => {
                 </div>
               </div>
             </div>
-            <Button size="icon-sm">
-              <XIcon />
-            </Button>
+            <ConfirmDialog
+              title="Löschen"
+              description="Möchstest du den Admin wirklich löschen?"
+              onConfirm={() => onRemoveAdmin(a.id)}
+              open={openConfirmDialog === a.id}
+              setOpen={(open) => setOpenConfirmDialog(open ? a.id : null)}
+            >
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="icon-sm">
+                  <X />
+                </Button>
+              </AlertDialogTrigger>
+            </ConfirmDialog>
           </div>
         ))}
 
