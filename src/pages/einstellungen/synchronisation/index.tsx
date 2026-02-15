@@ -70,6 +70,7 @@ const Synchronisation = () => {
         backNavigation="/einstellungen"
         className=" mt-8"
       />
+      <div>TODO add settings</div>
       <div className="mt-2 space-y-2">
         <h2 className="text-lg font-medium">Neue Spiele</h2>
         {data.data?.missingMatches.map((match) => (
