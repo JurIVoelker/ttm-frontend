@@ -73,7 +73,9 @@ const Synchronisation = () => {
       />
       <SyncSettings className="mt-8" onSave={() => data.refetch()} />
       <div className="mt-6 space-y-2">
-        <h2 className="text-lg font-medium">Neue Spiele</h2>
+        {data.data?.missingMatches.length !== 0 && (
+          <h2 className="text-lg font-medium">Neue Spiele</h2>
+        )}
         {data.data?.missingMatches.map((match) => (
           <SyncItem
             key={match.id}

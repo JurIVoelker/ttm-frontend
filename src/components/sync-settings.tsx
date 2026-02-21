@@ -14,10 +14,11 @@ import { Label } from "./ui/label";
 import { useFetchSyncSettings } from "@/hooks/use-fetch/use-fetch-sync-settings";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
+import { Settings } from "@/types/sync";
 
 interface SyncSettingsProps {
   className?: string;
-  onSave?: () => void;
+  onSave?: (settings: Settings) => void;
 }
 const SyncSettings = (props: SyncSettingsProps) => {
   const settings = useFetchSyncSettings();
@@ -44,10 +45,15 @@ const SyncSettings = (props: SyncSettingsProps) => {
       return;
     }
 
+    const json = await response.json();
+
     showMessage("Einstellungen erfolgreich gespeichert");
     setIsOpen(false);
     setLoading(false);
-    settings.refetch();
+    settings.setData(json);
+    if (props.onSave) {
+      props?.onSave(json);
+    }
   };
 
   return (
