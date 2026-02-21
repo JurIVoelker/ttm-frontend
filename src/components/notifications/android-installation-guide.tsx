@@ -56,7 +56,6 @@ const AndroidInstallationGuide = ({ ...props }) => {
           icon={<PlusSignSquareIcon className="size-5" />}
         />
         <OptionFiller
-          className="rounded-t-md"
           fillerText="Neuer Ikognito-Tab"
           icon={<IncognitoIcon className="size-5" />}
         />
