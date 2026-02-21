@@ -1,5 +1,6 @@
 import Layout from "@/components/layout";
 import NavigationButtons from "@/components/navigation-buttons";
+import SyncSettings from "@/components/sync-settings";
 import Title from "@/components/title";
 import { Button } from "@/components/ui/button";
 import { useFetchSync } from "@/hooks/use-fetch/use-fetch-sync";
@@ -70,8 +71,8 @@ const Synchronisation = () => {
         backNavigation="/einstellungen"
         className=" mt-8"
       />
-      <div>TODO add settings</div>
-      <div className="mt-2 space-y-2">
+      <SyncSettings className="mt-8" onSave={() => data.refetch()} />
+      <div className="mt-6 space-y-2">
         <h2 className="text-lg font-medium">Neue Spiele</h2>
         {data.data?.missingMatches.map((match) => (
           <SyncItem

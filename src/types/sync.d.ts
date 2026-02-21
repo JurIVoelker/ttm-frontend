@@ -54,3 +54,9 @@ export type TTApiMatchesReturnType = {
 };
 
 export type TTApiMatch = TTApiMatchesReturnType["matches"][number];
+
+export type Settings = {
+  id: string;
+  includeRRSync: boolean;
+  autoSync: boolean;
+}
