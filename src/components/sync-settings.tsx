@@ -1,13 +1,4 @@
-import { SettingsIcon } from "lucide-react";
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
@@ -24,7 +15,6 @@ const SyncSettings = (props: SyncSettingsProps) => {
   const settings = useFetchSyncSettings();
 
   const [isLoading, setLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
 
   const onSaveSettings = async () => {
     setLoading(true);
@@ -48,7 +38,6 @@ const SyncSettings = (props: SyncSettingsProps) => {
     const json = await response.json();
 
     showMessage("Einstellungen erfolgreich gespeichert");
-    setIsOpen(false);
     setLoading(false);
     settings.setData(json);
     if (props.onSave) {
@@ -57,66 +46,58 @@ const SyncSettings = (props: SyncSettingsProps) => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild className={props.className}>
-        <Button>
-          <SettingsIcon /> Einstellungen
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogTitle>Synchronisationseinstellungen</DialogTitle>
-        <DialogDescription>
-          Stelle deine Synchronisationseinstellungen ein.
-        </DialogDescription>
-        <form
-          className="space-y-3 mt-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSaveSettings();
-          }}
+    <>
+      <p className="text-muted-foreground mt-6 text-sm">
+        Stelle deine Synchronisationseinstellungen ein.
+      </p>
+      <form
+        className="space-y-3 mt-5"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSaveSettings();
+        }}
+      >
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="auto-sync-switch"
+            checked={settings.data?.autoSync}
+            onCheckedChange={() => {
+              if (settings.data) {
+                settings.setData({
+                  ...settings.data,
+                  autoSync: !settings.data.autoSync,
+                });
+              }
+            }}
+          />
+          <Label htmlFor="auto-sync-switch">Automatische Synchronisation</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="include-rr-sync-switch"
+            checked={settings.data?.includeRRSync}
+            onCheckedChange={() => {
+              if (settings.data) {
+                settings.setData({
+                  ...settings.data,
+                  includeRRSync: !settings.data.includeRRSync,
+                });
+              }
+            }}
+          />
+          <Label htmlFor="include-rr-sync-switch">
+            Rückrunde Synchronisieren
+          </Label>
+        </div>
+        <Button
+          onClick={onSaveSettings}
+          disabled={isLoading}
+          className="mt-6 w-full"
         >
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="auto-sync-switch"
-              checked={settings.data?.autoSync}
-              onCheckedChange={() => {
-                if (settings.data) {
-                  settings.setData({
-                    ...settings.data,
-                    autoSync: !settings.data.autoSync,
-                  });
-                }
-              }}
-            />
-            <Label htmlFor="auto-sync-switch">
-              Automatische Synchronisation
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="include-rr-sync-switch"
-              checked={settings.data?.includeRRSync}
-              onCheckedChange={() => {
-                if (settings.data) {
-                  settings.setData({
-                    ...settings.data,
-                    includeRRSync: !settings.data.includeRRSync,
-                  });
-                }
-              }}
-            />
-            <Label htmlFor="include-rr-sync-switch">
-              Rückrunde Synchronisieren
-            </Label>
-          </div>
-        </form>
-        <DialogFooter>
-          <Button onClick={onSaveSettings} disabled={isLoading}>
-            Speichern
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          Speichern
+        </Button>
+      </form>
+    </>
   );
 };
 
