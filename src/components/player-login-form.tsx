@@ -26,9 +26,15 @@ import {
 } from "./ui/form";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Button } from "./ui/button";
-import { fetchPlayersWithInviteToken, loginPlayer } from "@/lib/fetch-utils";
+import {
+  fetchPlayersWithInviteToken,
+  loginPlayer,
+  renewJwt,
+  sendRequest,
+} from "@/lib/fetch-utils";
 import { useRouter } from "next/router";
 import { Skeleton } from "./ui/skeleton";
+import { showMessage } from "@/lib/message";
 
 const PlayerLogin = () => {
   const teamSlug = mainStore((state) => state.teamSlug);
@@ -36,26 +42,84 @@ const PlayerLogin = () => {
   const [players, setPlayers] = useState<PlayerOfTeamDTO[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { push } = useRouter();
 
   useEffect(() => {
     if (!teamSlug || authStore.loading) return;
-    const inviteToken = new URLSearchParams(window.location.search).get(
-      "inviteToken",
-    );
+    const { authStore: auth } = authStore;
+    const { jwtDecoded } = auth;
 
-    if (!inviteToken) {
-      setIsLoading(false);
-      setError(INVALID_INVITE_LINK);
-      return;
-    }
+    const autoLogin = async () => {
+      if (!jwtDecoded || !jwtDecoded?.player || !jwtDecoded?.exp || !auth.jwt)
+        return;
+      const isExpired = jwtDecoded.exp * 1000 < Date.now();
 
-    setIsLoading(true);
-    fetchPlayersWithInviteToken(inviteToken || "", teamSlug || "")
-      .then((players) => {
-        authStore.authStore.setInviteToken(inviteToken);
+      let jwt = auth.jwt;
+
+      console.log(new Date(jwtDecoded.exp * 1000).toLocaleTimeString());
+
+      if (isExpired) {
+        console.log("JWT is expired. Attempting to refresh...");
+        const newJwt = await renewJwt();
+        if (!newJwt.jwt) {
+          console.error("Failed to renew JWT. Cannot auto-login.");
+          return;
+        }
+        jwt = newJwt.jwt;
+      }
+
+      const playersResponse = await sendRequest({
+        method: "GET",
+        path: `/api/players/${teamSlug}`,
+        options: {
+          jwt,
+        },
+      });
+
+      if (!playersResponse.ok) {
+        showMessage("Login fehlgeschlagen. Bitte versuche es erneut.", {
+          variant: "error",
+        });
+        return;
+      }
+
+      const players = (await playersResponse.json()) as {
+        players: PlayerOfTeamDTO[];
+      };
+
+      const playerInTeam = players.players.some(
+        (p) => p.id === jwtDecoded.player?.id,
+      );
+
+      if (playerInTeam) {
+        showMessage("Automatisch eingeloggt. Willkommen zurück!");
+        push(`/${teamSlug}`);
+        return;
+      }
+
+      setPlayers(players.players);
+
+      return players.players;
+    };
+
+    const handleNotLoggedIn = async () => {
+      const inviteToken = new URLSearchParams(window.location.search).get(
+        "inviteToken",
+      );
+
+      if (!inviteToken || !teamSlug) {
+        setIsLoading(false);
+        setError(INVALID_INVITE_LINK);
+        return;
+      }
+
+      try {
+        const players = await fetchPlayersWithInviteToken(
+          inviteToken || "",
+          teamSlug || "",
+        );
         setPlayers(players);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error(error);
         if (
           error instanceof Error &&
@@ -65,10 +129,18 @@ const PlayerLogin = () => {
         } else {
           setError("unknown");
         }
-      })
-      .finally(() => {
+      }
+    };
+
+    (async () => {
+      const result = await autoLogin();
+      if (result) {
         setIsLoading(false);
-      });
+        return;
+      }
+      await handleNotLoggedIn();
+      setIsLoading(false);
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [teamSlug, authStore.loading]);
 

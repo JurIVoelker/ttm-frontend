@@ -5,6 +5,7 @@ import {
   COULD_NOT_RENEW_JWT,
   JWT_MISSING_ERROR,
   PLAYER_JWT_RENEW_ERROR,
+  TOO_MANY_REQUESTS,
 } from "@/constants/error";
 import { authStore } from "@/store/auth-store";
 import { jwtPayload } from "@/types/auth";
@@ -21,7 +22,14 @@ interface RequestParams {
     renewJwt?: boolean;
     headers?: Record<string, string>;
     hideMessages?: boolean;
+    jwt?: string;
   };
+}
+
+const routeInfo = () => {
+  if (typeof window === "undefined") return;
+  if (window.location.pathname.includes("/info/login")) return;
+  window.location.pathname = "/info/login";
 }
 
 export const sendRequest = async ({
@@ -30,7 +38,7 @@ export const sendRequest = async ({
   body,
   options,
 }: RequestParams): Promise<Response> => {
-  let jwt = authStore.getState().jwt || "";
+  let jwt = options?.jwt || authStore.getState().jwt || "";
   const jwtPayload = decode(jwt) as jwtPayload;
   let renewResponse: Response | null = null;
 
@@ -38,7 +46,7 @@ export const sendRequest = async ({
   const hideMessages = options?.hideMessages ?? false;
 
   if (!jwtPayload || !jwtPayload?.exp) {
-    window.location.pathname = "/login";
+    routeInfo();
     throw new Error("Invalid JWT token");
   }
 
@@ -51,15 +59,16 @@ export const sendRequest = async ({
       jwt = newJwt;
       renewResponse = response;
     } catch (error) {
-      if (window.location.pathname !== "/login") {
-        window.location.pathname = "/login";
+      if (error instanceof Error && error.message.includes("Failed to fetch")) {
+        return new Response(JSON.stringify({ message: "Failed to fetch" }), { status: 503 });
+      } else {
+        routeInfo();
       }
-      console.error("Error renewing JWT:", error);
     }
   }
 
   if (!jwt) {
-    window.location.pathname = "/login";
+    routeInfo();
     return renewResponse || new Response(JSON.stringify({ message: COULD_NOT_RENEW_JWT }), { status: 401 });
   }
 
@@ -136,6 +145,10 @@ export const renewJwt = async (options: { excludePlayer?: boolean } = {}) => {
     });
 
     if (!response.ok) {
+      if (response.status === 429) {
+        console.error(TOO_MANY_REQUESTS);
+        return { jwt: "", response: new Response(JSON.stringify({ message: TOO_MANY_REQUESTS }), { status: response.status }) };
+      }
       console.error(ADMIN_LEADER_REFRESH_ERROR);
       return { jwt: "", response: new Response(JSON.stringify({ message: ADMIN_LEADER_REFRESH_ERROR }), { status: response.status }) };
     }

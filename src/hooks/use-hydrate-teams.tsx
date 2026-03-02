@@ -2,25 +2,44 @@ import { useEffect } from "react";
 import useAuthStore from "./use-auth-store";
 import { mainStore } from "@/store/main-store";
 import { sendRequest } from "@/lib/fetch-utils";
+import { useRouter } from "next/router";
 
 export const useHydrateTeams = () => {
   const { authStore, loading } = useAuthStore();
   const { setTeams } = mainStore();
+  const { push } = useRouter();
 
   useEffect(() => {
     if (loading || !authStore.jwt) return;
     (async () => {
-      const res = await sendRequest({
-        method: "GET",
-        path: "/api/teams",
-      });
-      if (!res.ok) {
-        console.error("Failed to fetch teams");
-        return;
+      console.log("Fetching teams...");
+      try {
+        const res = await sendRequest({
+          method: "GET",
+          path: "/api/teams",
+        });
+        if (!res.ok) {
+          if (res.status === 429) {
+            console.log(res.status);
+            return;
+          }
+          if (
+            res.status === 503 &&
+            !window.location.pathname.includes("/info/verbindung")
+          ) {
+            push("/info/verbindung");
+            return;
+          }
+          console.error("Failed to fetch teams");
+          return;
+        }
+        const data = await res.json();
+        setTeams(data.teams);
+      } catch (error) {
+        if (error instanceof Error && error.message === "Failed to fetch") {
+          push("/info/verbindung");
+        }
       }
-
-      const data = await res.json();
-      setTeams(data.teams);
     })();
-  }, [authStore.jwt, loading, setTeams]);
+  }, [authStore.jwt, loading, setTeams, push]);
 };
