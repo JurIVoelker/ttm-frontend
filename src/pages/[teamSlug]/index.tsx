@@ -1,3 +1,4 @@
+import CopyAllMatchInfo from "@/components/copy-all-match-info";
 import Layout from "@/components/layout";
 import MatchList from "@/components/match-list";
 import PlayersCard from "@/components/players-card/players-card";
@@ -49,9 +50,13 @@ const TeamPage = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
-        <Title className="animate-pop-in-subtle">{team?.name}</Title>
+      <div>
+        <Title className="animate-pop-in-subtle mb-6">{team?.name}</Title>
         <PlayersCard players={playerResponse?.data?.players || []} />
+        <CopyAllMatchInfo
+          matches={matchesResponse.data || []}
+          players={playerResponse?.data?.players || []}
+        />
         <MatchList
           matches={matchesResponse.data || []}
           allPlayers={playerResponse?.data?.players || []}
