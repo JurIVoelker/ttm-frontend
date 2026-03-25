@@ -113,7 +113,8 @@ export default function AddAdminModal({
                       <CommandItem
                         key={s.id}
                         value={s.fullName}
-                        onSelect={() => {
+                        onPointerDown={(e) => {
+                          e.preventDefault();
                           setName(s.fullName);
                           setEmail(s.email);
                           setSearchValue("");
