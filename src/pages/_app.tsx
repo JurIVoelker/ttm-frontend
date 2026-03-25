@@ -35,7 +35,7 @@ export default function App({ Component, pageProps }: AppProps) {
     >
       <ThemeProvider attribute="class" enableSystem disableTransitionOnChange>
         <div
-          className={`${poppins.className} min-h-screen w-full overflow-x-hidden`}
+          className={`${poppins.className} min-h-screen w-full`}
         >
           <Toaster />
           <Component {...pageProps} />
