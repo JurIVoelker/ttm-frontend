@@ -14,21 +14,33 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
 import { Admin } from "@/types/admin";
 
-interface AddLeaderModalProps {
+type Suggestion = { id: string; fullName: string; email: string };
+
+interface AddAdminModalProps {
   children: React.ReactNode;
   onAdd: (admin: Admin) => void;
+  suggestions: Suggestion[];
 }
 
 export default function AddAdminModal({
   children,
   onAdd,
-}: AddLeaderModalProps) {
+  suggestions,
+}: AddAdminModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [searchValue, setSearchValue] = useState("");
   const [isOpen, setOpen] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -71,6 +83,7 @@ export default function AddAdminModal({
   const resetForm = (isOpen = false) => {
     setName("");
     setEmail("");
+    setSearchValue("");
     setOpen(isOpen);
     setLoading(false);
   };
@@ -87,6 +100,32 @@ export default function AddAdminModal({
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
+            {suggestions.length > 0 && (
+              <Command className="w-full rounded-lg border">
+                <CommandInput
+                  placeholder="Vorhandene Person suchen..."
+                  value={searchValue}
+                  onValueChange={setSearchValue}
+                />
+                <CommandList className="max-h-36">
+                  <CommandGroup heading="Vorschläge">
+                    {suggestions.map((s) => (
+                      <CommandItem
+                        key={s.id}
+                        value={s.fullName}
+                        onSelect={() => {
+                          setName(s.fullName);
+                          setEmail(s.email);
+                          setSearchValue("");
+                        }}
+                      >
+                        {s.fullName}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            )}
             <div className="grid gap-2">
               <Label htmlFor="name">Name</Label>
               <Input

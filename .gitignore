@@ -41,3 +41,8 @@ yarn-error.log*
 next-env.d.ts
 
 certificates
+
+.agents/*
+CLAUDE.MD
+skills-lock.json
+mcp.json

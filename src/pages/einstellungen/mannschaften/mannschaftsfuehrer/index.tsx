@@ -9,6 +9,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
+import { useFetchAdmins } from "@/hooks/use-fetch/use-fetch-admins";
 import useFetchLeaders from "@/hooks/use-fetch/use-fetch-leaders";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
@@ -27,6 +28,10 @@ import { useState } from "react";
 const LeaderPage = () => {
   const teams = mainStore((state) => state.teams);
   const leaderFetch = useFetchLeaders();
+  const { data: admins } = useFetchAdmins();
+  const leaderSuggestions = [...(leaderFetch.data ?? []), ...(admins ?? [])].filter(
+    (s, i, arr) => arr.findIndex((x) => x.email === s.email) === i,
+  );
   const [openCollapsible, setOpenCollapsible] = useState<string | null>(null);
   const { back } = useRouter();
   const [openConfirmDialog, setOpenConfirmDialog] = useState<null | string>(
@@ -39,9 +44,13 @@ const LeaderPage = () => {
 
   const onRemoveLeader = async (leaderId: string, teamSlug: string) => {
     const prevState = leaderFetch.data;
-    const newLeaderData = leaderFetch.data?.filter(
-      (leader) => leader.id !== leaderId,
-    );
+    const newLeaderData = leaderFetch.data
+      ?.map((leader) =>
+        leader.id === leaderId
+          ? { ...leader, team: leader.team.filter((t) => t.slug !== teamSlug) }
+          : leader,
+      )
+      .filter((leader) => leader.team.length > 0);
     leaderFetch.setData(newLeaderData || []);
 
     const res = await sendRequest({
@@ -127,7 +136,18 @@ const LeaderPage = () => {
                       </ConfirmDialog>
                     </div>
                   ))}
-                <AddLeaderModal onAdd={onAddLeader} teamSlug={team.slug}>
+                <AddLeaderModal
+                  onAdd={onAddLeader}
+                  teamSlug={team.slug}
+                  suggestions={leaderSuggestions.filter(
+                    (s) =>
+                      !leaderFetch.data?.some(
+                        (l) =>
+                          l.email === s.email &&
+                          l.team.some((t) => t.slug === team.slug),
+                      ),
+                  )}
+                >
                   <Button className="w-full" variant="outline">
                     <PlusSignIcon strokeWidth={2} />
                     Hinzufügen

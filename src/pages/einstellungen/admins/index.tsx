@@ -5,6 +5,7 @@ import Title from "@/components/title";
 import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useFetchAdmins } from "@/hooks/use-fetch/use-fetch-admins";
+import useFetchLeaders from "@/hooks/use-fetch/use-fetch-leaders";
 import { sendRequest } from "@/lib/fetch-utils";
 import { Admin } from "@/types/admin";
 import { ArrowLeft01Icon, PlusSignIcon } from "hugeicons-react";
@@ -14,6 +15,7 @@ import { useState } from "react";
 
 const AdminsPage = () => {
   const { data: admins, setData: setAdmins } = useFetchAdmins();
+  const { data: leaders } = useFetchLeaders();
   const [openConfirmDialog, setOpenConfirmDialog] = useState<null | string>(
     null,
   );
@@ -82,7 +84,12 @@ const AdminsPage = () => {
           </div>
         ))}
 
-        <AddAdminModal onAdd={onAdd}>
+        <AddAdminModal
+          onAdd={onAdd}
+          suggestions={(leaders ?? []).filter(
+            (l) => !admins?.some((a) => a.email === l.email),
+          )}
+        >
           <Button variant="outline" className="w-full">
             <PlusSignIcon strokeWidth={2} />
             Hinzufügen
