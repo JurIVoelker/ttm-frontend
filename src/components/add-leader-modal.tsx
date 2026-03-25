@@ -116,8 +116,7 @@ export default function AddLeaderModal({
                       <CommandItem
                         key={s.id}
                         value={s.fullName}
-                        onPointerDown={(e) => {
-                          e.preventDefault();
+                        onSelect={() => {
                           setName(s.fullName);
                           setEmail(s.email);
                           setSearchValue("");
