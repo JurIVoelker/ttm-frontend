@@ -169,15 +169,3 @@ const AddPlayerDialog = ({
 };
 
 export default AddPlayerDialog;
-
-/* {players?.map((player) => (
-                  <CommandItem
-                    key={player.id}
-                    onSelect={() => {
-                      onAddPlayer(player);
-                      setOpen(false);
-                    }}
-                  >
-                    {player.fullName}
-                  </CommandItem>
-                ))} */

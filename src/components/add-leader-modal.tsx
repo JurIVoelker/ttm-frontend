@@ -118,11 +118,14 @@ export default function AddLeaderModal({
                         value={s.fullName}
                         onSelect={() => {
                           setName(s.fullName);
-                          setEmail(s.email);
+                          setEmail(s.email ?? "");
                           setSearchValue("");
                         }}
                       >
-                        {s.fullName}
+                        <div className="flex flex-col">
+                          <span>{s.fullName}</span>
+                          <span className="text-xs text-muted-foreground">{s.email}</span>
+                        </div>
                       </CommandItem>
                     ))}
                   </CommandGroup>
@@ -143,6 +146,7 @@ export default function AddLeaderModal({
               <Input
                 id="email"
                 type="email"
+                autoComplete="off"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

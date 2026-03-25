@@ -90,7 +90,7 @@ export default function AddAdminModal({
 
   const onSelectSuggestion = (suggestion: Suggestion) => {
     setName(suggestion.fullName);
-    setEmail(suggestion.email);
+    setEmail(suggestion.email ?? "");
     setSearchValue("");
   };
 
@@ -121,7 +121,10 @@ export default function AddAdminModal({
                         value={s.fullName}
                         onSelect={() => onSelectSuggestion(s)}
                       >
-                        {s.fullName}
+                        <div className="flex flex-col">
+                          <span>{s.fullName}</span>
+                          <span className="text-xs text-muted-foreground">{s.email}</span>
+                        </div>
                       </CommandItem>
                     ))}
                   </CommandGroup>
@@ -142,6 +145,7 @@ export default function AddAdminModal({
               <Input
                 id="email"
                 type="email"
+                autoComplete="off"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
