@@ -34,7 +34,9 @@ export default function App({ Component, pageProps }: AppProps) {
       persistOptions={{ persister: asyncStoragePersister }}
     >
       <ThemeProvider attribute="class" enableSystem disableTransitionOnChange>
-        <div className={`${poppins.className} min-h-screen w-full`}>
+        <div
+          className={`${poppins.className} min-h-screen w-full overflow-x-hidden`}
+        >
           <Toaster />
           <Component {...pageProps} />
         </div>
