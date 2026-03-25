@@ -88,6 +88,12 @@ export default function AddAdminModal({
     setLoading(false);
   };
 
+  const onSelectSuggestion = (suggestion: Suggestion) => {
+    setName(suggestion.fullName);
+    setEmail(suggestion.email);
+    setSearchValue("");
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={resetForm}>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -113,11 +119,7 @@ export default function AddAdminModal({
                       <CommandItem
                         key={s.id}
                         value={s.fullName}
-                        onSelect={() => {
-                          setName(s.fullName);
-                          setEmail(s.email);
-                          setSearchValue("");
-                        }}
+                        onSelect={() => onSelectSuggestion(s)}
                       >
                         {s.fullName}
                       </CommandItem>
