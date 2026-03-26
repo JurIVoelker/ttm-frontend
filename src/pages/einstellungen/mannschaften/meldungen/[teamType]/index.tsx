@@ -36,7 +36,7 @@ import { DragDropVerticalIcon, PlusSignIcon } from "hugeicons-react";
 import { XIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const PlayerPositionsPage = () => {
   const [teamCount, setTeamCount] = useState(0);
@@ -82,20 +82,27 @@ const PlayerPositionsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPending]);
 
-  const targetTeamType =
-    typeof window !== "undefined"
-      ? (window.location.pathname.split("/").slice(-1)[0] as TeamType)
-      : "";
+  const targetTeamType = useMemo(
+    () =>
+      typeof window !== "undefined"
+        ? (window.location.pathname.split("/").slice(-1)[0] as TeamType)
+        : "",
+    [],
+  );
 
-  const targetPlayers = data?.teams.find(
-    (team) => team.teamType === targetTeamType,
-  )?.players;
+  const targetPlayers = useMemo(
+    () => data?.teams.find((team) => team.teamType === targetTeamType)?.players,
+    [data, targetTeamType],
+  );
 
-  const syncPlayersForType =
-    syncPlayersData.data?.find((t) => t.teamType === targetTeamType)?.players ?? [];
+  const syncPlayersForType = useMemo(
+    () =>
+      syncPlayersData.data?.find((t) => t.teamType === targetTeamType)?.players ?? [],
+    [syncPlayersData.data, targetTeamType],
+  );
   const isAutoImportDisabled = syncPlayersForType.length === 0;
 
-  const onAutoImport = () => {
+  const onAutoImport = useCallback(() => {
     const existingPlayers = playerData.data?.players ?? [];
     const currentlyAssigned = targetPlayers ?? [];
 
@@ -148,68 +155,83 @@ const PlayerPositionsPage = () => {
     }
 
     playerData.setData({ players: updatedPlayers });
-  };
+  }, [syncPlayersForType, targetPlayers, playerData, data, setData, targetTeamType]);
 
-  const onDragOver = (event: DragOverEvent) => {
-    const { active, over } = event;
-    group.movePlayer({ activeId: active.id, overId: over?.id });
-    setData(group.getStateValue(data?.teams || []));
-  };
+  const group = useMemo(
+    () =>
+      new PlayerGroup({
+        players: targetPlayers || [],
+        type: targetTeamType as TeamType,
+        minLength: teamCount,
+      }),
+    [targetPlayers, targetTeamType, teamCount],
+  );
 
-  const onRemovePlayer = (playerId: string) => {
-    group.removePlayer(playerId);
-    setData(group.getStateValue(data?.teams));
-    const targetPlayer = playerData.data?.players.find(
-      (player) => player.id === playerId,
-    );
-    if (!targetPlayer) {
-      console.warn(
-        `Player with id ${playerId} not found. Cannot remove from team.`,
+  const onDragOver = useCallback(
+    (event: DragOverEvent) => {
+      const { active, over } = event;
+      group.movePlayer({ activeId: active.id, overId: over?.id });
+      setData(group.getStateValue(data?.teams || []));
+    },
+    [group, data, setData],
+  );
+
+  const onRemovePlayer = useCallback(
+    (playerId: string) => {
+      group.removePlayer(playerId);
+      setData(group.getStateValue(data?.teams));
+      const targetPlayer = playerData.data?.players.find(
+        (player) => player.id === playerId,
       );
-      return;
-    }
-    targetPlayer.positions = targetPlayer.positions.filter(
-      (pos) => pos.teamType !== targetTeamType,
-    );
-    playerData.setData({
-      players: [
-        ...(playerData.data?.players.filter(
-          (player) => player.id !== playerId,
-        ) || []),
-        targetPlayer,
-      ],
-    });
-  };
+      if (!targetPlayer) {
+        console.warn(
+          `Player with id ${playerId} not found. Cannot remove from team.`,
+        );
+        return;
+      }
+      targetPlayer.positions = targetPlayer.positions.filter(
+        (pos) => pos.teamType !== targetTeamType,
+      );
+      playerData.setData({
+        players: [
+          ...(playerData.data?.players.filter(
+            (player) => player.id !== playerId,
+          ) || []),
+          targetPlayer,
+        ],
+      });
+    },
+    [group, data, setData, playerData, targetTeamType],
+  );
 
-  const onAddPlayer = (player: PlayerOfTeamDTO) => {
-    if (!player.position) {
-      console.warn("Player has no position. Cannot be added to team.");
-      return;
-    }
-    if (!playerData.data) return;
-    group.removePlayer(player.id);
-    group.addPlayer(
-      player,
-      player.position.teamIndex,
-      player.position.position,
-    );
+  const onAddPlayer = useCallback(
+    (player: PlayerOfTeamDTO) => {
+      if (!player.position) {
+        console.warn("Player has no position. Cannot be added to team.");
+        return;
+      }
+      if (!playerData.data) return;
+      group.removePlayer(player.id);
+      group.addPlayer(player, player.position.teamIndex, player.position.position);
 
-    const playerDTO = {
-      id: player.id,
-      fullName: player.fullName,
-      positions: [player.position],
-    };
+      const playerDTO = {
+        id: player.id,
+        fullName: player.fullName,
+        positions: [player.position],
+      };
 
-    setData(group.getStateValue(data?.teams));
-    playerData.setData({
-      players: [
-        ...playerData.data.players.filter((p) => p.id !== player.id),
-        playerDTO,
-      ],
-    });
-  };
+      setData(group.getStateValue(data?.teams));
+      playerData.setData({
+        players: [
+          ...playerData.data.players.filter((p) => p.id !== player.id),
+          playerDTO,
+        ],
+      });
+    },
+    [group, data, setData, playerData],
+  );
 
-  const onSave = async () => {
+  const onSave = useCallback(async () => {
     setIsSaving(true);
     const response = await sendRequest({
       method: "PUT",
@@ -230,13 +252,7 @@ const PlayerPositionsPage = () => {
     showMessage("Meldungen erfolgreich gespeichert.");
     push(`/einstellungen/mannschaften/meldungen`);
     setIsSaving(false);
-  };
-
-  const group = new PlayerGroup({
-    players: targetPlayers || [],
-    type: targetTeamType as TeamType,
-    minLength: teamCount,
-  });
+  }, [group, targetTeamType, push]);
 
   const groupedTeams = group.group;
 
