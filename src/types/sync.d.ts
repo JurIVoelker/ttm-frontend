@@ -60,3 +60,13 @@ export type Settings = {
   includeRRSync: boolean;
   autoSync: boolean;
 }
+
+export type SyncPlayersReturnType = {
+  teamType: string;
+  players: {
+    name: string;
+    QTTR: number;
+    position: number;
+    teamIndex: number;
+  }[];
+}[];
