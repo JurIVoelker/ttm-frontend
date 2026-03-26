@@ -55,28 +55,9 @@ const SettingsPage = () => {
             <ArrowRight01Icon strokeWidth={2} />
           </Button>
         ))}
-        {/* <Button className="w-full">Test</Button> */}
       </div>
     </Layout>
   );
 };
 
 export default SettingsPage;
-
-{
-  /* <SidebarMenuButton onClick={() => navigate("/mannschaften")}>
-<AddTeamIcon strokeWidth={2} />
-Mannschaften
-</SidebarMenuButton>
-<SidebarMenuButton onClick={() => navigate("/admins")}>
-<ShieldUserIcon strokeWidth={2} />
-Admins verwalten
-</SidebarMenuButton>
-<SidebarMenuButton>
-<ArrowReloadHorizontalIcon
-  strokeWidth={2}
-  onClick={() => navigate("/synchronisation")}
-/>
-Synchronisation
-</SidebarMenuButton> */
-}

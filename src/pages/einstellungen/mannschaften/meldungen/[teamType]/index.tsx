@@ -1,4 +1,5 @@
 import AddPlayerDialog from "@/components/add-player-modal";
+import ConfirmDialog from "@/components/confirm-dialog";
 import Layout from "@/components/layout";
 import NavigationButtons from "@/components/navigation-buttons";
 import { Droppable } from "@/components/sort-players/droppable";
@@ -7,6 +8,7 @@ import Title from "@/components/title";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFetchPlayers } from "@/hooks/use-fetch/use-fetch-players";
+import { useFetchSyncPlayers } from "@/hooks/use-fetch/use-fetch-sync-players";
 import { useFetchTeamPositions } from "@/hooks/use-fetch/use-fetch-team-positions";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
@@ -40,8 +42,10 @@ const PlayerPositionsPage = () => {
   const [teamCount, setTeamCount] = useState(0);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [openAutoImport, setOpenAutoImport] = useState(false);
   const { data, setData, isPending } = useFetchTeamPositions();
   const playerData = useFetchPlayers();
+  const syncPlayersData = useFetchSyncPlayers();
   const pathName = usePathname();
   const { push } = useRouter();
 
@@ -86,6 +90,65 @@ const PlayerPositionsPage = () => {
   const targetPlayers = data?.teams.find(
     (team) => team.teamType === targetTeamType,
   )?.players;
+
+  const syncPlayersForType =
+    syncPlayersData.data?.find((t) => t.teamType === targetTeamType)?.players ?? [];
+  const isAutoImportDisabled = syncPlayersForType.length === 0;
+
+  const onAutoImport = () => {
+    const existingPlayers = playerData.data?.players ?? [];
+    const currentlyAssigned = targetPlayers ?? [];
+
+    const newPlayers: PlayerOfTeamDTO[] = syncPlayersForType.map((syncPlayer) => {
+      const existing = existingPlayers.find((p) => p.fullName === syncPlayer.name);
+      const id = existing?.id ?? crypto.randomUUID();
+      return {
+        id,
+        fullName: existing?.fullName ?? syncPlayer.name,
+        position: {
+          id: existing?.positions.find((pos) => pos.teamType === targetTeamType)?.id ?? crypto.randomUUID(),
+          playerId: id,
+          teamIndex: syncPlayer.teamIndex,
+          position: syncPlayer.position,
+          teamType: targetTeamType as TeamType,
+        },
+      };
+    });
+
+    const maxIndex = Math.max(...newPlayers.map((p) => p.position?.teamIndex ?? 0), 0);
+    setTeamCount(maxIndex);
+    setData({
+      teams: [
+        ...(data?.teams.filter((t) => t.teamType !== targetTeamType) ?? []),
+        { teamType: targetTeamType as TeamType, players: newPlayers },
+      ],
+    });
+
+    // Mirror onRemovePlayer: strip targetTeamType positions from previously assigned players
+    let updatedPlayers = existingPlayers.map((p) =>
+      currentlyAssigned.some((a) => a.id === p.id)
+        ? { ...p, positions: p.positions.filter((pos) => pos.teamType !== targetTeamType) }
+        : p,
+    );
+
+    // Mirror onAddPlayer: add/update the new position for each imported player
+    for (const newPlayer of newPlayers) {
+      const idx = updatedPlayers.findIndex((p) => p.id === newPlayer.id);
+      if (idx >= 0) {
+        updatedPlayers[idx] = {
+          ...updatedPlayers[idx],
+          positions: [
+            ...updatedPlayers[idx].positions.filter((pos) => pos.teamType !== targetTeamType),
+            newPlayer.position!,
+          ],
+        };
+      } else {
+        updatedPlayers = [...updatedPlayers, { id: newPlayer.id, fullName: newPlayer.fullName, positions: [newPlayer.position!] }];
+      }
+    }
+
+    playerData.setData({ players: updatedPlayers });
+  };
 
   const onDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
@@ -184,6 +247,22 @@ const PlayerPositionsPage = () => {
         Erstelle/entferne Mannschaften und verwalte die Mannschaftsmeldungen für
         die jeweiligen Mannschaften.
       </p>
+      <div className="mt-6 flex">
+        <Button
+          variant="outline"
+          disabled={isAutoImportDisabled}
+          onClick={() => setOpenAutoImport(true)}
+        >
+          Automatisch importieren
+        </Button>
+      </div>
+      <ConfirmDialog
+        open={openAutoImport}
+        setOpen={setOpenAutoImport}
+        title="Automatisch importieren"
+        description="Alle bestehenden Spieler werden entfernt und durch die Spieler aus dem Verband ersetzt. Danach Speichern nicht vergessen."
+        onConfirm={onAutoImport}
+      />
       <NavigationButtons
         onSave={onSave}
         isSaving={isSaving}
