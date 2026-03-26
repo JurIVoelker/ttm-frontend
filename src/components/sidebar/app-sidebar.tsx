@@ -8,7 +8,6 @@ import {
 } from "../ui/sidebar";
 import { cn } from "@/lib/utils";
 import { TeamDTO, TeamType } from "@/types/team";
-import { TEAM_TYPES } from "@/constants/team";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useRouter } from "next/navigation";
 import { mainStore } from "@/store/main-store";
@@ -56,15 +55,24 @@ const AppSidebar = () => {
     push("/login");
   };
 
-  const getTeamsByType = (type: TeamType) => {
-    return teams.filter((team) => team.type === type) || [];
+  const getTeamsByType = (...types: TeamType[]) => {
+    return teams.filter((team) => types.includes(team.type));
   };
 
   const noPlayers = teams.length === 0;
 
-  const groupedTeams: { type: TeamType; teams: TeamDTO[] }[] = TEAM_TYPES.map(
-    (t) => ({ type: t, teams: getTeamsByType(t) }),
-  );
+  const groupedTeams: { label: string; teams: TeamDTO[] }[] = [
+    { label: "Damen", teams: getTeamsByType("DAMEN") },
+    { label: "Erwachsene", teams: getTeamsByType("ERWACHSENE") },
+    {
+      label: "Jugend",
+      teams: getTeamsByType("JUGEND_12", "JUGEND_15", "JUGEND_19"),
+    },
+    {
+      label: "Mädchen",
+      teams: getTeamsByType("MADCHEN_12", "MADCHEN_15", "MADCHEN_19"),
+    },
+  ];
   const admin = isAdmin();
   const previlegedRole = admin || isLeader();
   const anyRole = previlegedRole || isPlayer();

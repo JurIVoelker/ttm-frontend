@@ -1,4 +1,4 @@
-import { TeamDTO, TeamType } from "@/types/team";
+import { TeamDTO } from "@/types/team";
 import {
   Collapsible,
   CollapsibleContent,
@@ -11,12 +11,11 @@ import {
 } from "../ui/sidebar";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "../ui/button";
-import { translateTeamType } from "@/constants/team";
 import { ArrowDown01Icon } from "hugeicons-react";
 import { mainStore } from "@/store/main-store";
 
 type TeamGroupProps = {
-  group: { type: TeamType; teams: TeamDTO[] };
+  group: { label: string; teams: TeamDTO[] };
   onClickTeam: (team: TeamDTO) => void;
 };
 
@@ -36,7 +35,7 @@ export const SidebarTeamGroup = ({ group, onClickTeam }: TeamGroupProps) => {
   if (group.teams.length === 0) return null;
   return (
     <Collapsible defaultOpen>
-      <CollapsibleTrigger asChild key={group.type}>
+      <CollapsibleTrigger asChild key={group.label}>
         <SidebarMenuButton
           className={cn(
             buttonVariants({
@@ -46,7 +45,7 @@ export const SidebarTeamGroup = ({ group, onClickTeam }: TeamGroupProps) => {
             "flex justify-between items-center",
           )}
         >
-          {translateTeamType(group.type)}
+          {group.label}
           <ArrowDown01Icon strokeWidth={2} />
         </SidebarMenuButton>
       </CollapsibleTrigger>

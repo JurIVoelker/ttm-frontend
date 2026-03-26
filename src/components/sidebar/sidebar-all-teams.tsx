@@ -1,11 +1,11 @@
-import { TeamDTO, TeamType } from "@/types/team";
+import { TeamDTO } from "@/types/team";
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu } from "../ui/sidebar";
 import { Skeleton } from "../ui/skeleton";
 import { SidebarTeamGroup } from "./sidebar-team-group";
 
 interface SidebarAllTeamsProps {
   noPlayers: boolean;
-  groupedTeams: { type: TeamType; teams: TeamDTO[] }[];
+  groupedTeams: { label: string; teams: TeamDTO[] }[];
   onClickTeam: (team: TeamDTO) => void;
 }
 
@@ -21,7 +21,7 @@ const SidebarAllTeams = ({
         {noPlayers && <LoadingState />}
         {groupedTeams.map((group) => (
           <SidebarTeamGroup
-            key={group.type}
+            key={group.label}
             group={group}
             onClickTeam={onClickTeam}
           />
