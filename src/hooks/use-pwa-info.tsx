@@ -47,10 +47,7 @@ const usePwaInfo = () => {
     try {
       console.log("Subscribing to push notifications...");
       setIsSubscribing(true);
-      const registration = await navigator.serviceWorker.getRegistration();
-      if (!registration) {
-        throw new Error("Service Worker Registrierung nicht gefunden.");
-      }
+      const registration = await navigator.serviceWorker.ready;
       const sub = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: getVapidUint8ArrayKey(),
