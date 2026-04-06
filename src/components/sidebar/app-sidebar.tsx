@@ -118,12 +118,12 @@ const AppSidebar = () => {
               Login für Mannschaftsführer
             </SidebarMenuButton>
           )}
-          {anyRole && (
+          {/**anyRole && (
             <SidebarMenuButton onClick={() => navigate("/benachrichtigungen")}>
               <Notification01Icon strokeWidth={2} />
               Benachrichtigungen
             </SidebarMenuButton>
-          )}
+          )**/}
           {admin && (
             <>
               <SidebarMenuButton onClick={() => navigate("/einstellungen")}>
