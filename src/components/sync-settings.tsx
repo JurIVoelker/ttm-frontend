@@ -5,6 +5,7 @@ import { Label } from "./ui/label";
 import { useFetchSyncSettings } from "@/hooks/use-fetch/use-fetch-sync-settings";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
+import { queryClient } from "@/lib/query";
 import { Settings } from "@/types/sync";
 
 interface SyncSettingsProps {
@@ -39,7 +40,7 @@ const SyncSettings = (props: SyncSettingsProps) => {
 
     showMessage("Einstellungen erfolgreich gespeichert");
     setLoading(false);
-    settings.setData(json);
+    queryClient.setQueryData(["sync-settings"], json);
     if (props.onSave) {
       props?.onSave(json);
     }
@@ -63,7 +64,7 @@ const SyncSettings = (props: SyncSettingsProps) => {
             checked={settings.data?.autoSync}
             onCheckedChange={() => {
               if (settings.data) {
-                settings.setData({
+                queryClient.setQueryData(["sync-settings"], {
                   ...settings.data,
                   autoSync: !settings.data.autoSync,
                 });
@@ -78,7 +79,7 @@ const SyncSettings = (props: SyncSettingsProps) => {
             checked={settings.data?.includeRRSync}
             onCheckedChange={() => {
               if (settings.data) {
-                settings.setData({
+                queryClient.setQueryData(["sync-settings"], {
                   ...settings.data,
                   includeRRSync: !settings.data.includeRRSync,
                 });

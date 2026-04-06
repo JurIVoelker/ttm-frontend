@@ -10,7 +10,6 @@ import {
 import { authStore } from "@/store/auth-store";
 import { jwtPayload } from "@/types/auth";
 import { decode } from "jsonwebtoken";
-import { formatDistanceStrict } from "date-fns";
 import { showMessage } from "./message";
 import { PlayerOfTeamDTO } from "@/types/player";
 
@@ -52,9 +51,6 @@ export const sendRequest = async ({
   }
 
   if (shouldRenewJwt && jwtPayload?.exp < Date.now() / 1000 + 5) {
-    console.log(
-      `JWT expired since ${formatDistanceStrict(new Date(jwtPayload.exp * 1000), new Date())}, renewing...`,
-    );
     try {
       const { jwt: newJwt, response } = await renewJwt();
       jwt = newJwt;
@@ -73,7 +69,6 @@ export const sendRequest = async ({
     return renewResponse || new Response(JSON.stringify({ message: COULD_NOT_RENEW_JWT }), { status: 401 });
   }
 
-  console.log(`-> [${method}] ${path}`);
   let response: Response;
   try {
     response = await fetch(API_URL + path, {
@@ -87,9 +82,7 @@ export const sendRequest = async ({
       credentials: "include",
     });
   } catch (error) {
-    console.error(`Error during fetch to ${path}:`, error);
     if (error instanceof Error) {
-      console.log(error.message)
       if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
         showMessage(
           "Verbindung fehlgeschlagen. Überprüfe deine Internetverbindung.",
@@ -99,8 +92,6 @@ export const sendRequest = async ({
     }
     throw error;
   }
-
-  console.log(`<- [${method}] ${path} - Status ${response.status}`);
 
   if (hideMessages) return response;
 

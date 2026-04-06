@@ -12,17 +12,13 @@ export const useHydrateTeams = () => {
   useEffect(() => {
     if (loading || !authStore.jwt) return;
     (async () => {
-      console.log("Fetching teams...");
       try {
         const res = await sendRequest({
           method: "GET",
           path: "/api/teams",
         });
         if (!res.ok) {
-          if (res.status === 429) {
-            console.log(res.status);
-            return;
-          }
+          if (res.status === 429) return;
           if (
             res.status === 503 &&
             !window.location.pathname.includes("/info/verbindung")
@@ -30,7 +26,6 @@ export const useHydrateTeams = () => {
             push("/info/verbindung");
             return;
           }
-          console.error("Failed to fetch teams");
           return;
         }
         const data = await res.json();

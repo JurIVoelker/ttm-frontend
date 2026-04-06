@@ -34,8 +34,9 @@ const ReplacementPlayerDrawer: React.FC<ReplacementPlayerDrawerProps> = ({
 }) => {
   const [players, setPlayers] = useState<PlayerOfTeamDTO[]>([]);
 
-  const selectedReplacementPlayers = selectedPlayers.filter((sp) =>
-    teams.every((t) => t.players.every((p) => p.id !== sp.id)),
+  const mainlinePlayerIds = new Set(teams.flatMap((t) => t.players.map((p) => p.id)));
+  const selectedReplacementPlayers = selectedPlayers.filter(
+    (sp) => !mainlinePlayerIds.has(sp.id),
   );
 
   const handleSelectPlayer = (playerId: string) => {
@@ -154,69 +155,3 @@ const ReplacementPlayerDrawer: React.FC<ReplacementPlayerDrawerProps> = ({
 };
 
 export default ReplacementPlayerDrawer;
-
-{
-  /* <div
-      className={cn(
-        "border rounded-sm p-3 bg-secondary/30",
-        variant === "highlighted" && "pulse-border",
-        className,
-      )}
-      {...props}
-    >
-      <h2
-        className={cn(
-          "font-semibold text-base",
-          variant !== "highlighted" && "text-muted-foreground font-normal",
-        )}
-      >
-        {title}
-      </h2>
-      {variant === "highlighted" && (
-        <p className="text-sm text-muted-foreground mb-3">
-          Diese Spieler sind in deiner Mannschaft gemeldet.{" "}
-        </p>
-      )}
-      <div className="text-sm space-y-1.5 mt-2">
-        {players?.map((p) => {
-          const isSelected = selectedPlayers?.some((sp) => sp.id === p.id);
-
-          return (
-            <button
-              key={p.id}
-              className={cn(
-                "rounded-md w-full py-1.5 px-1.5 bg-background text-left border flex gap-1.5 items-center",
-                isSelected &&
-                  "bg-primary text-primary-foreground border-primary",
-              )}
-              onClick={() => {
-                setSelectedPlayers((prev: PlayersOfTeamDTO[]) => {
-                  if (isSelected) {
-                    return prev.filter((sp) => sp.id !== p.id);
-                  } else {
-                    return [...prev, p];
-                  }
-                });
-              }}
-            >
-              <Tick01Icon
-                className={cn(
-                  "shrink-0 size-5 animate-pop-in",
-                  !isSelected && "hidden",
-                )}
-                strokeWidth={2}
-              />
-              <PlusIcon
-                className={cn(
-                  "shrink-0 size-5 animate-fade-in-rotate",
-                  isSelected && "hidden",
-                )}
-                strokeWidth={2}
-              />
-              {p.fullName}
-            </button>
-          );
-        })}
-      </div>
-    </div> */
-}

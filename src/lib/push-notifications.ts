@@ -20,10 +20,6 @@ export const getVapidUint8ArrayKey = () => {
 
 export const registerServiceWorker = async () => {
   if ("serviceWorker" in navigator) {
-    console.log("Registering SW...");
-    await navigator.serviceWorker.register("/sw.js").catch((error) => {
-      console.error("SW registration failed: ", error);
-    });
-    console.log("SW registered.");
+    await navigator.serviceWorker.register("/sw.js");
   }
 };

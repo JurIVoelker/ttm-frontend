@@ -13,6 +13,7 @@ import { useFetchAdmins } from "@/hooks/use-fetch/use-fetch-admins";
 import useFetchLeaders from "@/hooks/use-fetch/use-fetch-leaders";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
+import { queryClient } from "@/lib/query";
 import { cn } from "@/lib/utils";
 import { mainStore } from "@/store/main-store";
 import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
@@ -51,7 +52,7 @@ const LeaderPage = () => {
           : leader,
       )
       .filter((leader) => leader.team.length > 0);
-    leaderFetch.setData(newLeaderData || []);
+    queryClient.setQueryData(["leaders"], newLeaderData || []);
 
     const res = await sendRequest({
       path: `/api/leader/${teamSlug}`,
@@ -65,7 +66,7 @@ const LeaderPage = () => {
       showMessage("Fehler beim Entfernen des Mannschaftsführers", {
         variant: "error",
       });
-      leaderFetch.setData(prevState || []);
+      queryClient.setQueryData(["leaders"], prevState || []);
       return;
     }
   };

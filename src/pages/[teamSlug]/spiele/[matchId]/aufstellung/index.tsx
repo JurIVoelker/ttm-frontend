@@ -9,6 +9,7 @@ import { useFetchPlayersByTeamSlug } from "@/hooks/use-fetch/use-fetch-players-b
 import { useFetchTeamPositions } from "@/hooks/use-fetch/use-fetch-team-positions";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
+import { queryClient } from "@/lib/query";
 import { groupPlayersToOtherTeams } from "@/lib/team";
 import { mainStore } from "@/store/main-store";
 import { SingleMatchDTO } from "@/types/match";
@@ -37,17 +38,19 @@ const LineupPage = () => {
     teams: teams || [],
   });
 
+  const matchQueryKey = ["match-" + teamSlug + "-" + matchId];
+
   const onSelectPlayerReplacementPlayers = (
     selectedPlayers: PlayerOfTeamDTO[],
   ) => {
-    match.setData({
+    queryClient.setQueryData(matchQueryKey, {
       ...match.data,
       lineup: [...(lineup || []), ...selectedPlayers],
     } as SingleMatchDTO);
   };
 
   const onRemovePlayer = (player: PlayerOfTeamDTO) => {
-    match.setData({
+    queryClient.setQueryData(matchQueryKey, {
       ...match.data,
       lineup: lineup?.filter((lp) => lp.id !== player.id) || [],
     } as SingleMatchDTO);
@@ -58,7 +61,7 @@ const LineupPage = () => {
     if (isSelected) {
       onRemovePlayer(player);
     } else {
-      match.setData({
+      queryClient.setQueryData(matchQueryKey, {
         ...match.data,
         lineup: [...(lineup || []), player],
       } as SingleMatchDTO);

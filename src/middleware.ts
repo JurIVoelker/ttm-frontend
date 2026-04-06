@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   if (path.startsWith("/api")) {
-    return NextResponse.redirect(new URL(API_URL + path));
+    return NextResponse.rewrite(new URL(API_URL + path));
   }
 
   if (path.startsWith("/ttc")) {

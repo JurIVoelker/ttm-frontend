@@ -17,9 +17,8 @@ const GameAvailabilityDialog = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const notVotedPlayers = allPlayers.filter(
-    (p) => !votes.some((v) => v.playerId === p.id),
-  );
+  const votedPlayerIds = new Set(votes.map((v) => v.playerId));
+  const notVotedPlayers = allPlayers.filter((p) => !votedPlayerIds.has(p.id));
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

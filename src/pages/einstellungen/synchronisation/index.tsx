@@ -8,6 +8,7 @@ import { useFetchSync } from "@/hooks/use-fetch/use-fetch-sync";
 import { useFetchSyncIgnore } from "@/hooks/use-fetch/use-fetch-sync-ignore";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
+import { queryClient } from "@/lib/query";
 import { TTApiMatch } from "@/types/sync";
 import {
   DashboardCircleIcon,
@@ -59,7 +60,7 @@ const Synchronisation = () => {
       return matches.filter((match) => !selectedIds.includes(match.id));
     };
 
-    data.setData({
+    queryClient.setQueryData(["sync"], {
       ...data.data!,
       missingMatches: filterSelectedMatches(data.data?.missingMatches),
       unequalTimeMatches: filterSelectedMatches(data.data?.unequalTimeMatches),

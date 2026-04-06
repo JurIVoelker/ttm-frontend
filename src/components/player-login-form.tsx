@@ -56,15 +56,9 @@ const PlayerLogin = () => {
 
       let jwt = auth.jwt;
 
-      console.log(new Date(jwtDecoded.exp * 1000).toLocaleTimeString());
-
       if (isExpired) {
-        console.log("JWT is expired. Attempting to refresh...");
         const newJwt = await renewJwt();
-        if (!newJwt.jwt) {
-          console.error("Failed to renew JWT. Cannot auto-login.");
-          return;
-        }
+        if (!newJwt.jwt) return;
         jwt = newJwt.jwt;
       }
 
@@ -120,7 +114,6 @@ const PlayerLogin = () => {
         );
         setPlayers(players);
       } catch (error) {
-        console.error(error);
         if (
           error instanceof Error &&
           error.message === COULD_NOT_FETCH_PLAYERS_BY_INVITE_TOKEN

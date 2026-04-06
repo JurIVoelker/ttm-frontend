@@ -25,6 +25,8 @@ import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
 import { Admin } from "@/types/admin";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 type Suggestion = { id: string; fullName: string; email: string };
 
 interface AddAdminModalProps {
@@ -47,7 +49,7 @@ export default function AddAdminModal({
 
   useEffect(() => {
     const isNameValid = name.trim().length > 0;
-    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const isEmailValid = EMAIL_REGEX.test(email);
     setIsFormValid(isNameValid && isEmailValid);
   }, [name, email]);
 

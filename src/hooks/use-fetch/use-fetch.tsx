@@ -1,5 +1,4 @@
 import { sendRequest } from "@/lib/fetch-utils";
-import { useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 interface FetchDataProps {
@@ -11,11 +10,9 @@ interface FetchDataProps {
 }
 
 export function useFetchData<T>(props: FetchDataProps) {
-  const [data, setData] = useState<T | null>(null);
-
   const { method, path, body, ready = true, queryKey } = props;
 
-  const queryResponse = useQuery({
+  return useQuery<T>({
     queryKey: [queryKey],
     placeholderData: keepPreviousData,
     retryDelay: 1000,
@@ -37,15 +34,7 @@ export function useFetchData<T>(props: FetchDataProps) {
         );
       }
 
-      const data = (await response.json()) as T;
-      setData(data);
-      return data;
+      return response.json() as Promise<T>;
     },
   });
-
-  return {
-    ...queryResponse,
-    data,
-    setData: (data: T) => setData(data),
-  };
 }

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useFetchAdmins } from "@/hooks/use-fetch/use-fetch-admins";
 import useFetchLeaders from "@/hooks/use-fetch/use-fetch-leaders";
 import { sendRequest } from "@/lib/fetch-utils";
+import { queryClient } from "@/lib/query";
 import { Admin } from "@/types/admin";
 import { ArrowLeft01Icon, PlusSignIcon } from "hugeicons-react";
 import { User2, X } from "lucide-react";
@@ -14,7 +15,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 
 const AdminsPage = () => {
-  const { data: admins, setData: setAdmins } = useFetchAdmins();
+  const { data: admins } = useFetchAdmins();
   const { data: leaders } = useFetchLeaders();
   const [openConfirmDialog, setOpenConfirmDialog] = useState<null | string>(
     null,
@@ -23,12 +24,12 @@ const AdminsPage = () => {
   const { push } = useRouter();
 
   const onAdd = (admin: Admin) => {
-    setAdmins([...(admins || []), admin]);
+    queryClient.setQueryData(["admins"], [...(admins || []), admin]);
   };
 
   const onRemoveAdmin = async (adminId: string) => {
     const prevState = admins;
-    setAdmins(admins?.filter((a) => a.id !== adminId) || []);
+    queryClient.setQueryData(["admins"], admins?.filter((a) => a.id !== adminId) || []);
 
     const response = await sendRequest({
       method: "DELETE",
@@ -36,7 +37,7 @@ const AdminsPage = () => {
     });
 
     if (!response.ok) {
-      setAdmins(prevState || []);
+      queryClient.setQueryData(["admins"], prevState || []);
       return;
     }
   };

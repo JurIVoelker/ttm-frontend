@@ -12,26 +12,27 @@ import { useEffect } from "react";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["200", "400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      console.log("Registering SW...");
-      window.addEventListener("load", registerServiceWorker);
+    if (!("serviceWorker" in navigator)) return;
+    if (document.readyState === "complete") {
+      registerServiceWorker();
     } else {
-      console.log("Service workers are not supported.");
+      window.addEventListener("load", registerServiceWorker);
+      return () => window.removeEventListener("load", registerServiceWorker);
     }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigator.serviceWorker]);
+  }, []);
 
   useHydrateTeams();
 
   return (
     <PersistQueryClientProvider
       client={queryClient}
-      persistOptions={{ persister: asyncStoragePersister }}
+      persistOptions={{ persister: asyncStoragePersister, maxAge: 1000 * 60 * 60 * 24 }}
     >
       <ThemeProvider attribute="class" enableSystem disableTransitionOnChange>
         <div

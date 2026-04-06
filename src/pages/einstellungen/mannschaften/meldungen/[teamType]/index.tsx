@@ -12,6 +12,7 @@ import { useFetchSyncPlayers } from "@/hooks/use-fetch/use-fetch-sync-players";
 import { useFetchTeamPositions } from "@/hooks/use-fetch/use-fetch-team-positions";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
+import { queryClient } from "@/lib/query";
 import { PlayerGroup } from "@/lib/player.sort";
 import { getTeamName } from "@/lib/team";
 import { cn } from "@/lib/utils";
@@ -43,7 +44,7 @@ const PlayerPositionsPage = () => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [openAutoImport, setOpenAutoImport] = useState(false);
-  const { data, setData, isPending } = useFetchTeamPositions();
+  const { data, isPending } = useFetchTeamPositions();
   const playerData = useFetchPlayers();
   const syncPlayersData = useFetchSyncPlayers();
   const pathName = usePathname();
@@ -124,7 +125,7 @@ const PlayerPositionsPage = () => {
 
     const maxIndex = Math.max(...newPlayers.map((p) => p.position?.teamIndex ?? 0), 0);
     setTeamCount(maxIndex);
-    setData({
+    queryClient.setQueryData(["team-positions"], {
       teams: [
         ...(data?.teams.filter((t) => t.teamType !== targetTeamType) ?? []),
         { teamType: targetTeamType as TeamType, players: newPlayers },
@@ -154,8 +155,8 @@ const PlayerPositionsPage = () => {
       }
     }
 
-    playerData.setData({ players: updatedPlayers });
-  }, [syncPlayersForType, targetPlayers, playerData, data, setData, targetTeamType]);
+    queryClient.setQueryData(["players"], { players: updatedPlayers });
+  }, [syncPlayersForType, targetPlayers, playerData, data, targetTeamType]);
 
   const group = useMemo(
     () =>
@@ -171,15 +172,15 @@ const PlayerPositionsPage = () => {
     (event: DragOverEvent) => {
       const { active, over } = event;
       group.movePlayer({ activeId: active.id, overId: over?.id });
-      setData(group.getStateValue(data?.teams || []));
+      queryClient.setQueryData(["team-positions"], group.getStateValue(data?.teams || []));
     },
-    [group, data, setData],
+    [group, data],
   );
 
   const onRemovePlayer = useCallback(
     (playerId: string) => {
       group.removePlayer(playerId);
-      setData(group.getStateValue(data?.teams));
+      queryClient.setQueryData(["team-positions"], group.getStateValue(data?.teams));
       const targetPlayer = playerData.data?.players.find(
         (player) => player.id === playerId,
       );
@@ -189,19 +190,22 @@ const PlayerPositionsPage = () => {
         );
         return;
       }
-      targetPlayer.positions = targetPlayer.positions.filter(
-        (pos) => pos.teamType !== targetTeamType,
-      );
-      playerData.setData({
+      const updatedPlayer = {
+        ...targetPlayer,
+        positions: targetPlayer.positions.filter(
+          (pos) => pos.teamType !== targetTeamType,
+        ),
+      };
+      queryClient.setQueryData(["players"], {
         players: [
           ...(playerData.data?.players.filter(
             (player) => player.id !== playerId,
           ) || []),
-          targetPlayer,
+          updatedPlayer,
         ],
       });
     },
-    [group, data, setData, playerData, targetTeamType],
+    [group, data, playerData, targetTeamType],
   );
 
   const onAddPlayer = useCallback(
@@ -220,15 +224,15 @@ const PlayerPositionsPage = () => {
         positions: [player.position],
       };
 
-      setData(group.getStateValue(data?.teams));
-      playerData.setData({
+      queryClient.setQueryData(["team-positions"], group.getStateValue(data?.teams));
+      queryClient.setQueryData(["players"], {
         players: [
           ...playerData.data.players.filter((p) => p.id !== player.id),
           playerDTO,
         ],
       });
     },
-    [group, data, setData, playerData],
+    [group, data, playerData],
   );
 
   const onSave = useCallback(async () => {

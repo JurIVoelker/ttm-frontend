@@ -5,6 +5,7 @@ import Title from "@/components/title";
 import { Button } from "@/components/ui/button";
 import useFetchLeaders from "@/hooks/use-fetch/use-fetch-leaders";
 import { useFetchTeamPositions } from "@/hooks/use-fetch/use-fetch-team-positions";
+import { queryClient } from "@/lib/query";
 import { mainStore } from "@/store/main-store";
 import { TeamDTO, TeamPositionsDTO } from "@/types/team";
 import {
@@ -34,7 +35,7 @@ const EditTeamPage = () => {
     setTeam(team);
   }, []);
 
-  const { data, setData } = useFetchTeamPositions();
+  const { data } = useFetchTeamPositions();
 
   const leaderFetch = useFetchLeaders();
 
@@ -93,7 +94,7 @@ const EditTeamPage = () => {
         players: [...playersOfOtherTeams, ...newOrder],
       },
     ];
-    setData({ teams: newData });
+    queryClient.setQueryData(["team-positions"], { teams: newData });
   }
 
   async function handleSave() {

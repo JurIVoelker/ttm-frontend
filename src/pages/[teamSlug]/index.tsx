@@ -5,6 +5,7 @@ import PlayersCard from "@/components/players-card/players-card";
 import Title from "@/components/title";
 import useFetchMatchesByTeamSlug from "@/hooks/use-fetch/use-fetch-matches-by-team-slug";
 import { useFetchPlayersByTeamSlug } from "@/hooks/use-fetch/use-fetch-players-by-team-slug";
+import { queryClient } from "@/lib/query";
 import { authStore } from "@/store/auth-store";
 import { mainStore } from "@/store/main-store";
 import { Availability } from "@/types/match";
@@ -30,22 +31,22 @@ const TeamPage = () => {
 
   const onSaveVote = async (availability: Availability, matchId: string) => {
     const playerId = authStore.getState().jwtDecoded?.player?.id;
-    if (!playerId) return;
-    const targetMatch = matchesResponse?.data?.find((m) => m.id === matchId);
-    if (!targetMatch) return;
-    const targetVote = targetMatch.matchAvailabilityVotes.find(
-      (v) => v.playerId === playerId && v.matchId === matchId,
-    );
-    if (targetVote) {
-      targetVote.availability = availability;
-    } else {
-      targetMatch.matchAvailabilityVotes.push({
-        playerId,
-        matchId,
-        availability,
-      });
-    }
-    matchesResponse.setData(matchesResponse.data!);
+    if (!playerId || !matchesResponse.data) return;
+    const updatedMatches = matchesResponse.data.map((m) => {
+      if (m.id !== matchId) return m;
+      const existingVote = m.matchAvailabilityVotes.find(
+        (v) => v.playerId === playerId && v.matchId === matchId,
+      );
+      const updatedVotes = existingVote
+        ? m.matchAvailabilityVotes.map((v) =>
+            v.playerId === playerId && v.matchId === matchId
+              ? { ...v, availability }
+              : v,
+          )
+        : [...m.matchAvailabilityVotes, { playerId, matchId, availability }];
+      return { ...m, matchAvailabilityVotes: updatedVotes };
+    });
+    queryClient.setQueryData(["fetch-matches-" + teamSlug], updatedMatches);
   };
 
   return (

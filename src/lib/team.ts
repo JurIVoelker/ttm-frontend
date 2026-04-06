@@ -54,7 +54,7 @@ export const groupPlayersByTeam = (players: PlayerOfTeamDTO[], minLength?: numbe
     players: PlayerOfTeamDTO[];
   }[] = [];
 
-  const sortedPlayers = players.sort((a, b) => {
+  const sortedPlayers = players.toSorted((a, b) => {
     const priorityA = a.position === undefined ? 0 : 1000 * a.position.teamIndex + a.position.position;
     const priorityB = b.position === undefined ? 0 : 1000 * b.position.teamIndex + b.position.position;
     return priorityA - priorityB;

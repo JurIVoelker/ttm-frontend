@@ -25,6 +25,8 @@ import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
 import { LeaderDTO } from "@/types/leader";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 type Suggestion = { id: string; fullName: string; email: string };
 
 interface AddLeaderModalProps {
@@ -49,7 +51,7 @@ export default function AddLeaderModal({
 
   useEffect(() => {
     const isNameValid = name.trim().length > 0;
-    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const isEmailValid = EMAIL_REGEX.test(email);
     setIsFormValid(isNameValid && isEmailValid);
   }, [name, email]);
 

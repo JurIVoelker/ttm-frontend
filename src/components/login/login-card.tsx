@@ -17,6 +17,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import useAuthStore from "@/hooks/use-auth-store";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function LoginCard() {
   // State for form fields
   const [email, setEmail] = useState("");
@@ -34,11 +36,7 @@ export default function LoginCard() {
 
   const { authStore } = useAuthStore();
 
-  // Validate email format
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const validateEmail = (email: string) => EMAIL_REGEX.test(email);
 
   // Handle form submission
   const handleSubmit = async (e: FormEvent) => {

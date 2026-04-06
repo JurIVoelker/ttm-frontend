@@ -29,7 +29,7 @@ const NavigationButtons = ({
           backNavigation={backNavigation}
         />
       </div>
-      <div className="fixed bottom-4 right-6 items-center gap-2 hidden md:flex p-2 bg-background rounded-md border blurred-shadow">
+      <div className="fixed bottom-4 right-6 items-center gap-2 hidden md:flex p-2 bg-background rounded-md border blurred-shadow z-50">
         <Buttons
           onSave={onSave}
           isSaving={isSaving}

@@ -45,7 +45,6 @@ const usePwaInfo = () => {
 
   const subscribe = async () => {
     try {
-      console.log("Subscribing to push notifications...");
       setIsSubscribing(true);
       const registration = await navigator.serviceWorker.ready;
       const sub = await registration.pushManager.subscribe({
@@ -70,7 +69,6 @@ const usePwaInfo = () => {
           `${error.message} ${error.name} ${error.stack} ${JSON.stringify(error.cause)}`,
         );
       }
-      console.error("Subscription failed: ", error);
     } finally {
       setIsSubscribing(false);
     }

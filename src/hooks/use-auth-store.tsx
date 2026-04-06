@@ -1,17 +1,10 @@
 import { authStore } from "@/store/auth-store";
-import { useEffect, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 
 const useAuthStore = () => {
-  const [loading, setLoading] = useState(true);
-  const store = authStore((state) => state);
+  const store = authStore(useShallow((state) => state));
 
-  useEffect(() => {
-    if (loading && store.isHydrated) {
-      setLoading(false);
-    }
-  }, [store, loading]);
-
-  return { authStore: store, loading };
+  return { authStore: store, loading: !store.isHydrated };
 };
 
 export default useAuthStore;

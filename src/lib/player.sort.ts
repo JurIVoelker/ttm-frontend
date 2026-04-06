@@ -26,7 +26,7 @@ export class PlayerGroup {
       this.group.push({ index: i + 1, teamName: `${translateTeamType(type)} ${intToRoman(i + 1)}`, players: [] })
     }
 
-    const sortedPlayers = filteredPlayers.sort((a, b) => {
+    const sortedPlayers = filteredPlayers.toSorted((a, b) => {
       const priorityA = a.position!.teamIndex * 1000 + a.position!.position;
       const priorityB = b.position!.teamIndex * 1000 + b.position!.position;
       return priorityA - priorityB;

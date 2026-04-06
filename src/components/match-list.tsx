@@ -22,7 +22,7 @@ import {
   Location01Icon,
   PencilEdit02Icon,
 } from "hugeicons-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   isAdmin,
   isLeader,
@@ -339,16 +339,19 @@ const MatchAvailability = ({
   const [availability, setAvailability] = useState<Availability>(
     defaultValue || "NOT_RESPONDED",
   );
-  const leaderButNotPlayer = isLeader() && !isPlayerOfTeam();
-  const hideContent = !isPlayerOfTeam() && !isAdmin() && !isLeader();
+  const [prevDefault, setPrevDefault] = useState(defaultValue);
+  if (prevDefault !== defaultValue && defaultValue) {
+    setPrevDefault(defaultValue);
+    setAvailability(defaultValue);
+  }
+
+  const leader = isLeader();
+  const playerOfTeam = isPlayerOfTeam();
+  const admin = isAdmin();
+  const leaderButNotPlayer = leader && !playerOfTeam;
+  const hideContent = !playerOfTeam && !admin && !leader;
 
   const { push } = useRouter();
-
-  useEffect(() => {
-    if (defaultValue) {
-      setAvailability(defaultValue);
-    }
-  }, [defaultValue]);
 
   if (hideContent) return null;
 
@@ -380,9 +383,6 @@ const MatchAvailability = ({
           // TODO logout user and show message
         }
       }
-      if (response.status === 401) {
-        console.log("handle not logged in");
-      }
     }
   };
 
@@ -393,7 +393,7 @@ const MatchAvailability = ({
           ? "Abstimmungen der Spieler"
           : "Hast du Zeit zu spielen?"}
       </h3>
-      {isPlayerOfTeam() && (
+      {playerOfTeam && (
         <div className="flex gap-2 mb-2">
           <Button
             className="grow"
