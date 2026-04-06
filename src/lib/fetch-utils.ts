@@ -29,6 +29,7 @@ interface RequestParams {
 const routeInfo = () => {
   if (typeof window === "undefined") return;
   if (window.location.pathname.includes("/info/login")) return;
+  authStore.getState().reset();
   window.location.pathname = "/info/login";
 }
 
