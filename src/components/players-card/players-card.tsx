@@ -17,6 +17,7 @@ import { showMessage } from "@/lib/message";
 import { useRouter } from "next/router";
 import LeaveTeamButton from "./leave-team";
 import useFetchInviteToken from "@/hooks/use-fetch/use-fetch-invite-token";
+import { track } from "@/lib/umami";
 
 const PlayersCard = ({ players }: { players: PlayerOfTeamDTO[] }) => {
   const { authStore } = useAuthStore();
@@ -39,6 +40,7 @@ const PlayersCard = ({ players }: { players: PlayerOfTeamDTO[] }) => {
       const inviteLink = `${window.location.origin}/${teamSlug}/login?inviteToken=${inviteToken}`;
       navigator.clipboard.writeText(inviteLink);
       showMessage("Einladungslink kopiert");
+      track("copy-invite-link");
       authStore.setInviteToken(inviteToken);
     }
   };

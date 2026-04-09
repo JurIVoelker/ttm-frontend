@@ -19,6 +19,7 @@ import {
 } from "hugeicons-react";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
+import { track } from "@/lib/umami";
 
 const Synchronisation = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -86,6 +87,7 @@ const Synchronisation = () => {
       return;
     }
     showMessage("Daten erfolgreich synchronisiert");
+    track("sync-matches");
   };
 
   const onSaveIgnored = async () => {

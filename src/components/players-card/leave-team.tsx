@@ -6,6 +6,7 @@ import { Logout02Icon } from "hugeicons-react";
 import useAuthStore from "@/hooks/use-auth-store";
 import { useState } from "react";
 import ConfirmDialog from "../confirm-dialog";
+import { track } from "@/lib/umami";
 
 const LeaveTeamButton = () => {
   const { authStore } = useAuthStore();
@@ -20,6 +21,7 @@ const LeaveTeamButton = () => {
     } else {
       authStore.setJwt(null);
     }
+    track("leave-team");
   };
 
   return (

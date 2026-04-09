@@ -6,6 +6,7 @@ import { useFetchTeamPositions } from "@/hooks/use-fetch/use-fetch-team-position
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
 import { groupPlayersToOtherTeams } from "@/lib/team";
+import { track } from "@/lib/umami";
 import { cn } from "@/lib/utils";
 import { mainStore } from "@/store/main-store";
 import { PlayerOfTeamDTO } from "@/types/player";
@@ -59,9 +60,11 @@ const ManagePlayersPage = () => {
     });
 
     if (response.ok) {
+      track("add-players-to-team");
       showMessage("Spielerauswahl gespeichert");
       push(`/${teamSlug}`);
     } else {
+      track("error:add-players-to-team");
       showMessage("Fehler beim Speichern der Auswahl", { variant: "error" });
     }
     setIsSaving(false);

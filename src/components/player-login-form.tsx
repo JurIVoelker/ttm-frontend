@@ -35,6 +35,7 @@ import {
 import { useRouter } from "next/router";
 import { Skeleton } from "./ui/skeleton";
 import { showMessage } from "@/lib/message";
+import { track } from "@/lib/umami";
 
 const PlayerLogin = () => {
   const teamSlug = mainStore((state) => state.teamSlug);
@@ -87,6 +88,7 @@ const PlayerLogin = () => {
 
       if (playerInTeam) {
         showMessage("Automatisch eingeloggt. Willkommen zurück!");
+        track("auto-join-team");
         push(`/${teamSlug}`);
         return;
       }
@@ -196,6 +198,7 @@ const PlayerLoginForm = ({ players }: { players: PlayerOfTeamDTO[] }) => {
     setLoading(true);
     const res = await loginPlayer(data.playerId);
     if (res) {
+      track("join-team");
       push(`/${mainStore.getState().teamSlug}`);
     }
     setLoading(false);

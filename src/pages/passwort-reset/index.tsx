@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { track } from "@/lib/umami";
 
 const formSchema = z.object({
   email: z
@@ -88,6 +89,7 @@ export default function PasswordResetPage() {
       );
     } else {
       setSuccess("Das Passwort wurde erfolgreich zurückgesetzt");
+      track("password-reset");
     }
 
     setIsLoading(false);

@@ -24,6 +24,7 @@ import {
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
 import { Admin } from "@/types/admin";
+import { track } from "@/lib/umami";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -62,10 +63,12 @@ export default function AddAdminModal({
     });
     setLoading(false);
     if (!res.ok) {
+      track("error:add-admin");
       showMessage(`Der Admin konnte nicht hinzugefügt werden`, {
         variant: "error",
       });
     } else {
+      track("add-admin");
       setOpen(false);
       showMessage(`Der Admin wurde erfolgreich hinzugefügt`, {
         variant: "success",

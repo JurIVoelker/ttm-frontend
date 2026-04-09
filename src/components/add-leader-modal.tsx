@@ -24,6 +24,7 @@ import {
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
 import { LeaderDTO } from "@/types/leader";
+import { track } from "@/lib/umami";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -64,10 +65,12 @@ export default function AddLeaderModal({
     });
     setLoading(false);
     if (!res.ok) {
+      track("error:add-leader");
       showMessage(`Der Mannschaftsführer konnte nicht hinzugefügt werden`, {
         variant: "error",
       });
     } else {
+      track("add-leader");
       setOpen(false);
       showMessage(`Der Mannschaftsführer wurde erfolgreich hinzugefügt`, {
         variant: "success",

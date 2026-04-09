@@ -17,6 +17,7 @@ import { PlayerOfTeamDTO } from "@/types/player";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { track } from "@/lib/umami";
 
 const LineupPage = () => {
   const matchId = usePathname()?.split("/")?.[3];
@@ -77,8 +78,11 @@ const LineupPage = () => {
     });
 
     if (res.ok) {
+      track("save-lineup");
       showMessage("Die Aufstellung wurde erfolgreich gespeichert.");
       push(`/${teamSlug}#match-card-${matchId}`);
+    } else {
+      track("error:save-lineup");
     }
     setLoading(false);
   };

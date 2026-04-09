@@ -24,6 +24,7 @@ import {
 } from "./ui/form";
 import { useRouter } from "next/router";
 import { GoogleIcon } from "hugeicons-react";
+import { track } from "@/lib/umami";
 
 // Define the form validation schema
 const formSchema = z
@@ -76,12 +77,16 @@ export const RegisterCard = () => {
         Bitte einen Admin darum, dich als Mannschaftsführer in einer \
         Mannschaft aufzunehmen und versuche es erneut.",
         );
+        track("error:register", { reason: "leader-not-found" });
       }
       if (res.status === 409) {
         setError(
           "Diese E-Mail-Adresse ist bereits registriert. Bitte logge dich ein.",
         );
+        track("error:register", { reason: "already-registered" });
       }
+    } else {
+      track("register");
     }
     setIsSubmitting(false);
   };

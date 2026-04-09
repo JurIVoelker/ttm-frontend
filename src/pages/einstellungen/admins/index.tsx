@@ -13,6 +13,7 @@ import { ArrowLeft01Icon, PlusSignIcon } from "hugeicons-react";
 import { User2, X } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { track } from "@/lib/umami";
 
 const AdminsPage = () => {
   const { data: admins } = useFetchAdmins();
@@ -37,9 +38,11 @@ const AdminsPage = () => {
     });
 
     if (!response.ok) {
+      track("error:remove-admin");
       queryClient.setQueryData(["admins"], prevState || []);
       return;
     }
+    track("remove-admin");
   };
 
   return (

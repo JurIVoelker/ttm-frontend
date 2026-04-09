@@ -26,6 +26,7 @@ import { sendRequest } from "@/lib/fetch-utils";
 import ConfirmDialog from "../confirm-dialog";
 import { useState } from "react";
 import { showMessage } from "@/lib/message";
+import { track } from "@/lib/umami";
 
 const AppSidebar = () => {
   const { toggleSidebar } = useSidebar();
@@ -52,6 +53,7 @@ const AppSidebar = () => {
     authStore.reset();
     mainStore.getState().reset();
     showMessage("Erfolgreich abgemeldet.");
+    track("sign-out");
     push("/login");
   };
 

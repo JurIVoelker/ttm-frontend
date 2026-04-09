@@ -16,6 +16,7 @@ import { GoogleIcon, Mail01Icon } from "hugeicons-react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import useAuthStore from "@/hooks/use-auth-store";
+import { track } from "@/lib/umami";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -78,6 +79,7 @@ export default function LoginCard() {
       } else {
         const data = await response.json();
         authStore.setJwt(data.jwt);
+        track("sign-in");
         push("/");
       }
       setLoading(false);

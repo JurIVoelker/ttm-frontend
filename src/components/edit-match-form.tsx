@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { showMessage } from "@/lib/message";
+import { track } from "@/lib/umami";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 import { Skeleton } from "./ui/skeleton";
@@ -134,8 +135,11 @@ const EditMatchForm: React.FC<EditMatchFormProps> = ({
       });
     }
     if (res.ok) {
+      track(isCreate ? "create-match" : "edit-match");
       showMessage(`Spiel erfolgreich ${isCreate ? "erstellt" : "bearbeitet"}`);
       push(`/${teamSlug}${isCreate ? "" : `#match-card-${match?.id}`}`);
+    } else {
+      track(isCreate ? "error:create-match" : "error:edit-match");
     }
   };
 

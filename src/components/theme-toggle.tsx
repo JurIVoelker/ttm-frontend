@@ -3,6 +3,7 @@
 import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
 
 import { useTheme } from "next-themes";
+import { track } from "@/lib/umami";
 import { SidebarMenuButton } from "./ui/sidebar";
 
 export type Theme = "light" | "dark" | "system";
@@ -16,13 +17,13 @@ export default function ThemeToggle() {
   const toggleTheme = () => {
     if (theme === "dark") {
       setTheme("light");
-      // umami()?.track("theme-toggle", { theme: "light" });
+      track("theme-toggle", { theme: "light" });
     } else if (theme === "light") {
       setTheme("system");
-      // umami()?.track("theme-toggle", { theme: "system" });
+      track("theme-toggle", { theme: "system" });
     } else {
       setTheme("dark");
-      // umami()?.track("theme-toggle", { theme: "dark" });
+      track("theme-toggle", { theme: "dark" });
     }
   };
 

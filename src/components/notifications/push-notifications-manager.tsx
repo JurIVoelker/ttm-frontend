@@ -3,6 +3,7 @@ import { urlBase64ToUint8Array } from "@/lib/push-notifications";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { sendRequest } from "@/lib/fetch-utils";
+import { track } from "@/lib/umami";
 
 export function PushNotificationManager() {
   const [isSupported, setIsSupported] = useState(false);
@@ -44,12 +45,13 @@ export function PushNotificationManager() {
     });
     setIsLoading(false);
     showMessage("Benachrichtigungen wurden aktiviert.");
+    track("subscribe-push-notifications");
   }
 
   async function unsubscribeFromPush() {
     await subscription?.unsubscribe();
     setSubscription(null);
-    // await unsubscribeUser();
+    track("unsubscribe-push-notifications");
   }
 
   if (!isSupported) {

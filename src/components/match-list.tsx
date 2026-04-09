@@ -57,6 +57,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { sendRequest } from "@/lib/fetch-utils";
 import { authStore } from "@/store/auth-store";
+import { track } from "@/lib/umami";
 
 interface MatchListProps {
   matches: MatchesDTO;
@@ -159,6 +160,7 @@ const MatchCardHeader = ({
     }
     navigator.clipboard.writeText(text);
     showMessage("Infotext in die Zwischenablage kopiert");
+    track("copy-info-text");
   };
   const onEditMatch = () => {
     const teamSlug = mainStore.getState().teamSlug;
@@ -170,6 +172,7 @@ const MatchCardHeader = ({
   };
   const onDeleteMatch = () => {
     setIsOpen(false);
+    track("delete-match");
   };
 
   return (
@@ -369,6 +372,7 @@ const MatchAvailability = ({
 
     if (!response.ok) {
       setAvailability(prevVal);
+      track("error:vote", { status: String(response.status) });
       if (response.status === 403) {
         if (authStore.getState().inviteToken) {
           showMessage(
@@ -383,6 +387,8 @@ const MatchAvailability = ({
           // TODO logout user and show message
         }
       }
+    } else {
+      track("vote");
     }
   };
 

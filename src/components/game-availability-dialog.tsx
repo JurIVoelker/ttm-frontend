@@ -7,6 +7,7 @@ import { Badge } from "./ui/badge";
 import { PlayerOfTeamDTO } from "@/types/player";
 import { MatchAvailabilityVote } from "@/types/match";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { track } from "@/lib/umami";
 
 const GameAvailabilityDialog = ({
   votes,
@@ -29,6 +30,7 @@ const GameAvailabilityDialog = ({
           disabled={votes.length === 0}
           onClick={() => {
             setIsOpen(true);
+            track("open-availability-dialog");
           }}
         >
           {votes.length > 0 ? (

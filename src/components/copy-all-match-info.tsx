@@ -13,6 +13,7 @@ import { MatchDTO } from "@/types/match";
 import { getInfoTextString } from "@/lib/match";
 import { PlayerOfTeamDTO } from "@/types/player";
 import { showMessage } from "@/lib/message";
+import { track } from "@/lib/umami";
 
 const CopyAllMatchInfo = ({
   matches,
@@ -39,6 +40,7 @@ const CopyAllMatchInfo = ({
     const finalText = infoTextStrings.join("\n\n");
     navigator.clipboard.writeText(finalText);
     showMessage("Infotexte wurden in die Zwischenablage kopiert");
+    track("copy-all-match-info", { numberOfMatches: matchesWithLineup.length });
   };
 
   return (
