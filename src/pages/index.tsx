@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 export default function Home() {
-  const { teams } = mainStore();
+  const { teams, teamsLoaded } = mainStore();
   const { authStore, loading } = useAuthStore();
   const { push } = useRouter();
 
@@ -15,7 +15,11 @@ export default function Home() {
       push("/info/login");
       return;
     }
-    if (teams.length === 0) return;
+    if (!teamsLoaded) return;
+    if (teams.length === 0) {
+      push("/einstellungen");
+      return;
+    }
     if (!authStore.jwt || !authStore.jwtDecoded) return;
     const { player, leader, admin } = authStore.jwtDecoded;
     if (player?.teams.length) {
@@ -30,7 +34,7 @@ export default function Home() {
     }
     push("/info/login/abgelaufen");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teams, authStore, loading]);
+  }, [teams, teamsLoaded, authStore, loading]);
 
   return (
     <Layout hideSidebar>
