@@ -87,6 +87,8 @@ export const RegisterCard = () => {
       }
     } else {
       track("register");
+      push("/login?registered=true");
+      return;
     }
     setIsSubmitting(false);
   };

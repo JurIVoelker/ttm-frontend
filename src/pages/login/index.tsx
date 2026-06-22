@@ -5,19 +5,28 @@ import { Button } from "@/components/ui/button";
 import useAuthStore from "@/hooks/use-auth-store";
 import { showMessage } from "@/lib/message";
 import { authStore } from "@/store/auth-store";
+import { useRouter } from "next/router";
 
 const LoginPage = () => {
   const { authStore } = useAuthStore();
+  const { query } = useRouter();
 
   const isLoggedIn =
     authStore.jwtDecoded?.roles.includes("admin") ||
     authStore.jwtDecoded?.roles.includes("leader");
 
+  const justRegistered = query.registered === "true";
+
   return (
     <Layout hideSidebar>
       {isLoggedIn && <LoggedIn />}
       {!isLoggedIn && (
-        <div className="w-full h-full flex justify-center items-center">
+        <div className="w-full h-full flex flex-col justify-center items-center gap-4">
+          {justRegistered && (
+            <div className="w-[90%] max-w-md rounded-md border border-positive-border bg-positive-light px-4 py-3 text-sm text-positive-dark">
+              Du wurdest erfolgreich registriert. Bitte logge dich jetzt ein.
+            </div>
+          )}
           <LoginCard />
         </div>
       )}
