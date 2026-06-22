@@ -100,11 +100,11 @@ const LineupPage = () => {
         <Badge variant="negative" className="translate-y-0.5">
           Keine Zeit
         </Badge>
-        {", "}
+        {", oder "}
         <Badge variant="neutral" className="translate-y-0.5">
           Vielleicht
         </Badge>{" "}
-        oder kannst du sehen, ob sie Zeit haben. Spieler mit der Plakette{" "}
+        kannst du sehen, ob sie Zeit haben. Spieler mit der Plakette{" "}
         <Badge variant="outline">Unbekannt</Badge> haben noch nicht abgestimmt.
       </div>
       <NavigationButtons

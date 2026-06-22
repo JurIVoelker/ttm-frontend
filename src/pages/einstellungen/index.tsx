@@ -37,8 +37,9 @@ const SettingsPage = () => {
     <Layout>
       <Title>Konfiguration</Title>
       <p className="text-muted-foreground mt-4">
-        In den Konfigurationen kannst du die Mannschaftsmeldungen verwalten,
-        die{" "}
+        In den Konfigurationen kannst du die Mannschaftsmeldungen verwalten, die
+        Mannaschaftsführer festlegen, die Admins verwalten und die
+        Spielsynchronisation einrichten.
       </p>
       <div className="space-y-2 mt-6">
         {paths.map(({ name, path, Icon }) => (

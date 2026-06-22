@@ -299,7 +299,7 @@ const LineupInfo = ({ match }: { match: MatchDTO }) => {
       )}
       {showNoLineup && (
         <div className="mt-2 text-sm text-muted-foreground">
-          Keine Aufstellung vorhanden.
+          Noch keine Aufstellung vom Mannschaftsführer ausgewählt.
         </div>
       )}
       {!noLineup && (
