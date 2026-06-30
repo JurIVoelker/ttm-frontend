@@ -30,6 +30,7 @@ import {
   isPlayerOfTeam,
 } from "@/lib/permission";
 import useAuthStore from "@/hooks/use-auth-store";
+import { useQueryClient } from "@tanstack/react-query";
 import GameAvailabilityDialog from "./game-availability-dialog";
 import { PlayerOfTeamDTO } from "@/types/player";
 import {
@@ -151,6 +152,7 @@ const MatchCardHeader = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const { push } = useRouter();
+  const queryClient = useQueryClient();
 
   const onCopy = () => {
     const text = getInfoTextString(match, allPlayers);
@@ -170,9 +172,18 @@ const MatchCardHeader = ({
     const teamSlug = mainStore.getState().teamSlug;
     push(`${teamSlug}/spiele/${match.id}/aufstellung`);
   };
-  const onDeleteMatch = () => {
+  const onDeleteMatch = async () => {
     setIsOpen(false);
-    track("delete-match");
+    const teamSlug = mainStore.getState().teamSlug;
+    const response = await sendRequest({
+      method: "DELETE",
+      path: `/api/match/${teamSlug}/${match.id}`,
+    });
+    if (response.ok) {
+      track("delete-match");
+      showMessage("Spiel erfolgreich gelöscht");
+      queryClient.invalidateQueries({ queryKey: [`fetch-matches-${teamSlug}`] });
+    }
   };
 
   return (
