@@ -61,6 +61,36 @@ export type Settings = {
   autoSync: boolean;
 }
 
+export type SyncTrigger = "AUTO" | "MANUAL";
+
+export type SyncMatchDetail = {
+  id: string;
+  home: string;
+  away: string;
+  datetime: string;
+  reason?: string;
+};
+
+export type SyncLogDetails = {
+  successfulSyncs: SyncMatchDetail[];
+  failedSyncs: SyncMatchDetail[];
+  updatedMatches: SyncMatchDetail[];
+};
+
+export type SyncLogDTO = {
+  id: string;
+  createdAt: string;
+  trigger: SyncTrigger;
+  status: "COMPLETED" | "SKIPPED" | "FAILED";
+  includeRRSync: boolean;
+  autoSync: boolean;
+  successfulSyncsCount: number;
+  failedSyncsCount: number;
+  updatedMatchesCount: number;
+  details: SyncLogDetails | null;
+  error: string | null;
+};
+
 export type SyncPlayersReturnType = {
   teamType: string;
   players: {

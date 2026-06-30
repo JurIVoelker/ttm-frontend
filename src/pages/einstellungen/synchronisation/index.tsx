@@ -1,5 +1,6 @@
 import Layout from "@/components/layout";
 import NavigationButtons from "@/components/navigation-buttons";
+import SyncLogs from "@/components/sync-logs/sync-logs";
 import SyncSettings from "@/components/sync-settings";
 import Title from "@/components/title";
 import { Button } from "@/components/ui/button";
@@ -309,6 +310,7 @@ const Synchronisation = () => {
         </TabsContent>
         <TabsContent value="settings">
           <SyncSettings className="mt-8" onSave={() => data.refetch()} />
+          <SyncLogs className="mt-10" />
         </TabsContent>
       </Tabs>
     </Layout>
