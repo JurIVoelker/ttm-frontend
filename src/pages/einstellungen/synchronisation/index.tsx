@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFetchSync } from "@/hooks/use-fetch/use-fetch-sync";
 import { useFetchSyncIgnore } from "@/hooks/use-fetch/use-fetch-sync-ignore";
+import { useFetchSyncSettings } from "@/hooks/use-fetch/use-fetch-sync-settings";
 import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
 import { queryClient } from "@/lib/query";
@@ -27,11 +28,18 @@ const Synchronisation = () => {
   const [ignoredIds, setIgnoredIds] = useState<string[]>([]);
   const [unignoreListIds, setUnignoreListIds] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
   const data = useFetchSync();
   const ignoredData = useFetchSyncIgnore();
+  const settings = useFetchSyncSettings();
 
   const onSave = async () => {
     setIsSaving(true);
+    if (activeTab === "settings") {
+      await onSaveSettings();
+      setIsSaving(false);
+      return;
+    }
     if (selectedIds.length) {
       await onSaveSync();
     }
@@ -54,6 +62,30 @@ const Synchronisation = () => {
     data.refetch();
     ignoredData.refetch();
     setIsSaving(false);
+  };
+
+  const onSaveSettings = async () => {
+    const response = await sendRequest({
+      method: "POST",
+      path: "/api/sync/settings",
+      body: {
+        autoSync: settings.data?.autoSync,
+        includeRRSync: settings.data?.includeRRSync,
+      },
+    });
+
+    if (!response.ok) {
+      showMessage("Fehler beim Speichern der Einstellungen", {
+        variant: "error",
+      });
+      return;
+    }
+
+    const json = await response.json();
+
+    showMessage("Einstellungen erfolgreich gespeichert");
+    queryClient.setQueryData(["sync-settings"], json);
+    data.refetch();
   };
 
   const onSaveSync = async () => {
@@ -168,7 +200,7 @@ const Synchronisation = () => {
         backNavigation="/einstellungen"
         className="mt-8"
       />
-      <Tabs defaultValue="overview">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="max-w-[calc(100vw-3rem)] overflow-hidden w-full md:mt-8">
           <TabsTrigger value="overview" className="flex items-center min-w-0">
             <DashboardCircleIcon strokeWidth={2} />
@@ -309,7 +341,7 @@ const Synchronisation = () => {
           </div>
         </TabsContent>
         <TabsContent value="settings">
-          <SyncSettings className="mt-8" onSave={() => data.refetch()} />
+          <SyncSettings className="mt-8" />
           <SyncLogs className="mt-10" />
         </TabsContent>
       </Tabs>

@@ -14,7 +14,6 @@ import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
 import { queryClient } from "@/lib/query";
 import { PlayerGroup } from "@/lib/player.sort";
-import { getTeamName } from "@/lib/team";
 import { cn } from "@/lib/utils";
 import { PlayerOfTeamDTO } from "@/types/player";
 import { TeamType } from "@/types/team";
@@ -40,6 +39,8 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 const noDisplacementStrategy = () => null;
+
+const dndMeasuring = { droppable: { strategy: MeasuringStrategy.Always } };
 
 const PlayerPositionsPage = () => {
   const [teamCount, setTeamCount] = useState(0);
@@ -343,7 +344,7 @@ const PlayerPositionsPage = () => {
         onDragCancel={() => setActiveId(null)}
         sensors={sensors}
         collisionDetection={rectIntersection}
-        measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
+        measuring={dndMeasuring}
         onDragOver={onDragOver}
         autoScroll={false}
       >
@@ -354,31 +355,6 @@ const PlayerPositionsPage = () => {
         >
           {groupedTeams.map((team, index) => {
             if (targetTeamType === "") return null;
-            if (team.players.length === 0)
-              return (
-                <Droppable
-                  id={`team-${index + 1}`}
-                  className="space-y-2 mt-6 border p-5 rounded-lg"
-                  key={index}
-                >
-                  <p className="font-medium mb-6">
-                    {getTeamName(targetTeamType, index + 1)}
-                  </p>
-
-                  <div className="p-2 border rounded-lg mt-4 text-muted-foreground flex items-center gap-1 bg-card">
-                    <PlusSignIcon strokeWidth={2} className="size-5" />
-                    Noch keine Spieler
-                  </div>
-
-                  <AddPlayerDialog
-                    onAddPlayer={onAddPlayer}
-                    teamIndex={index + 1}
-                    teamPosition={team.players.length + 1}
-                    allPlayers={playerData?.data?.players || []}
-                    targetTeamType={targetTeamType}
-                  />
-                </Droppable>
-              );
             return (
               <Droppable
                 id={`team-${index + 1}`}
@@ -386,43 +362,50 @@ const PlayerPositionsPage = () => {
                 key={index}
               >
                 <h3 className="mb-4 font-medium">{team.teamName}</h3>
-                <div className="space-y-1.5">
-                  {team.players.map((player, playerIndex) => (
-                    <div
-                      key={player.id}
-                      className={cn("flex items-center w-full gap-2")}
-                    >
+                {team.players.length === 0 ? (
+                  <div className="p-2 border rounded-lg mt-4 text-muted-foreground flex items-center gap-1 bg-card">
+                    <PlusSignIcon strokeWidth={2} className="size-5" />
+                    Noch keine Spieler
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    {team.players.map((player, playerIndex) => (
                       <div
-                        className={cn(
-                          "bg-secondary text-secondary-foreground size-6 flex items-center justify-center rounded-md font-semibold shrink-0 mr-2",
-                          activeId === player.id &&
-                            "bg-primary text-primary-foreground",
-                        )}
+                        key={player.id}
+                        className={cn("flex items-center w-full gap-2")}
                       >
-                        {playerIndex + 1}
-                      </div>
-                      <SortablePlayerItem id={player.id}>
                         <div
                           className={cn(
-                            "px-2 py-1.5 bg-secondary/40 active:bg-secondary hover:cursor-grab active:cursor-grabbing transition-colors rounded-md border w-full flex items-center gap-1.5",
-                            activeId === player.id && "opacity-20",
+                            "bg-secondary text-secondary-foreground size-6 flex items-center justify-center rounded-md font-semibold shrink-0 mr-2",
+                            activeId === player.id &&
+                              "bg-primary text-primary-foreground",
                           )}
                         >
-                          <DragDropVerticalIcon className="shrink-0" />
-                          {player.fullName}
+                          {playerIndex + 1}
                         </div>
-                      </SortablePlayerItem>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        className="shrink-0"
-                        onClick={() => onRemovePlayer(player.id)}
-                      >
-                        <XIcon />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+                        <SortablePlayerItem id={player.id}>
+                          <div
+                            className={cn(
+                              "px-2 py-1.5 bg-secondary/40 active:bg-secondary hover:cursor-grab active:cursor-grabbing transition-colors rounded-md border w-full flex items-center gap-1.5",
+                              activeId === player.id && "opacity-20",
+                            )}
+                          >
+                            <DragDropVerticalIcon className="shrink-0" />
+                            {player.fullName}
+                          </div>
+                        </SortablePlayerItem>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="shrink-0"
+                          onClick={() => onRemovePlayer(player.id)}
+                        >
+                          <XIcon />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <AddPlayerDialog
                   onAddPlayer={onAddPlayer}
                   teamIndex={index + 1}
