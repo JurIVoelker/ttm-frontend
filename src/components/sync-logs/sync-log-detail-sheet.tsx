@@ -9,6 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import { SyncLogDTO, SyncMatchDetail } from "@/types/sync";
 import { XIcon } from "lucide-react";
+import { useState } from "react";
 import {
   deriveSyncStatus,
   formatFullDate,
@@ -30,9 +31,17 @@ export const SyncLogDetailSheet = ({
   open,
   onOpenChange,
 }: SyncLogDetailSheetProps) => {
+  // Keep the last sync rendered so the content stays mounted while the
+  // drawer animates closed after the caller clears its selection.
+  const [lastSync, setLastSync] = useState(sync);
+  if (sync && sync !== lastSync) setLastSync(sync);
+  const displayedSync = sync ?? lastSync;
+
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent>{sync && <DetailContent sync={sync} />}</DrawerContent>
+      <DrawerContent>
+        {displayedSync && <DetailContent sync={displayedSync} />}
+      </DrawerContent>
     </Drawer>
   );
 };

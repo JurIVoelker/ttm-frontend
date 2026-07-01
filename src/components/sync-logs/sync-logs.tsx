@@ -100,7 +100,7 @@ const SyncLogRow = ({
     <button
       type="button"
       onClick={onSelect}
-      className="hover:bg-muted/50 flex min-h-[44px] w-full items-center gap-3 px-3 py-3 text-left transition-colors first:rounded-t-md last:rounded-b-md"
+      className="hover:bg-muted/50 flex min-h-11 w-full items-center gap-3 px-3 py-3 text-left transition-colors first:rounded-t-md last:rounded-b-md"
     >
       <span
         className={cn("size-2.5 shrink-0 rounded-full", syncStatusConfig[status].dot)}
