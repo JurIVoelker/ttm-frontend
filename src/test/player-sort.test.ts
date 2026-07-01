@@ -58,6 +58,7 @@ test("Add player", () => {
   const group = new PlayerGroup({ players: [p1, p2], type: "ERWACHSENE" });
   const p3 = p(1, 3);
   group.addPlayer(p3, 1, 2);
+  p3.position!.position = 2;
   p2.position!.position = 3;
   expect(group.group).toEqual([
     { index: 1, teamName: "Erwachsene I", players: [p1, p3, p2] },
@@ -99,9 +100,55 @@ test("Move between groups", () => {
   p1.position!.position = 1;
   p1.position!.teamIndex = 2;
   p2.position!.position = 2;
+  p3.position!.position = 3;
   expect(group.group).toEqual([
     { index: 1, teamName: "Erwachsene I", players: [] },
     { index: 2, teamName: "Erwachsene II", players: [p1, p2, p3] },
+  ]);
+});
+
+test("Move up into previous group lands last when below over item", () => {
+  const p1 = p(1, 1);
+  const p2 = p(1, 2);
+  const p3 = p(2, 1);
+  const group = new PlayerGroup({ players: [p1, p2, p3], type: "ERWACHSENE" });
+  group.movePlayer({ overId: p2.id, activeId: p3.id, isBelowOverItem: true });
+  p3.position!.teamIndex = 1;
+  p3.position!.position = 3;
+  expect(group.group).toEqual([
+    { index: 1, teamName: "Erwachsene I", players: [p1, p2, p3] },
+    { index: 2, teamName: "Erwachsene II", players: [] },
+  ]);
+});
+
+test("Move down into next group lands first when above over item", () => {
+  const p1 = p(1, 1);
+  const p2 = p(1, 2);
+  const p3 = p(2, 1);
+  const p4 = p(2, 2);
+  const group = new PlayerGroup({ players: [p1, p2, p3, p4], type: "ERWACHSENE" });
+  group.movePlayer({ overId: p3.id, activeId: p2.id, isBelowOverItem: false });
+  p2.position!.teamIndex = 2;
+  p2.position!.position = 1;
+  p3.position!.position = 2;
+  p4.position!.position = 3;
+  expect(group.group).toEqual([
+    { index: 1, teamName: "Erwachsene I", players: [p1] },
+    { index: 2, teamName: "Erwachsene II", players: [p2, p3, p4] },
+  ]);
+});
+
+test("Move onto team card from below lands last", () => {
+  const p1 = p(1, 1);
+  const p2 = p(1, 2);
+  const p3 = p(2, 1);
+  const group = new PlayerGroup({ players: [p1, p2, p3], type: "ERWACHSENE" });
+  group.movePlayer({ overId: "team-1", activeId: p3.id, isBelowOverItem: true });
+  p3.position!.teamIndex = 1;
+  p3.position!.position = 3;
+  expect(group.group).toEqual([
+    { index: 1, teamName: "Erwachsene I", players: [p1, p2, p3] },
+    { index: 2, teamName: "Erwachsene II", players: [] },
   ]);
 });
 

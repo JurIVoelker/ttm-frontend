@@ -16,7 +16,11 @@ export class PlayerGroup {
 
   public constructor({ players, minLength, type }: { players: PlayerOfTeamDTO[], minLength?: number, type: TeamType }) {
     this.type = type;
-    const filteredPlayers = players.filter((player) => player.position?.teamType === type)
+    // Clone players so position updates never mutate the React Query cache in
+    // place — otherwise structural sharing sees no change and skips re-renders.
+    const filteredPlayers = players
+      .filter((player) => player.position?.teamType === type)
+      .map((player) => ({ ...player, position: { ...player.position! } }));
     if (filteredPlayers.length !== players.length) {
       console.warn("Some players have a different team type than the group type or no position and will be ignored in the grouping.");
     }
@@ -58,7 +62,10 @@ export class PlayerGroup {
       console.warn(`Team with index ${teamIndex} not found. Player not added.`);
       return;
     }
-    team.players.splice(position - 1, 0, player);
+    team.players.splice(position - 1, 0, {
+      ...player,
+      position: player.position ? { ...player.position } : player.position,
+    });
     this.recalculatePositions();
   }
 
@@ -73,7 +80,7 @@ export class PlayerGroup {
     }
   }
 
-  public movePlayer({ overId, activeId }: { overId?: UniqueIdentifier, activeId?: UniqueIdentifier }) {
+  public movePlayer({ overId, activeId, isBelowOverItem }: { overId?: UniqueIdentifier, activeId?: UniqueIdentifier, isBelowOverItem?: boolean }) {
     const players = this.listPlayers();
     const activePlayer = players.find((p) => p.id === activeId);
     if (!activePlayer) return;
@@ -83,7 +90,7 @@ export class PlayerGroup {
       const targetTeam = this.group.find((t) => t.index === teamIndex);
       if (!targetTeam) return;
       this.removePlayer(activePlayer.id);
-      this.addPlayer(activePlayer, teamIndex, 1);
+      this.addPlayer(activePlayer, teamIndex, isBelowOverItem ? targetTeam.players.length + 1 : 1);
       return;
     }
 
@@ -98,8 +105,9 @@ export class PlayerGroup {
       overTeam.players = movedTeam;
       this.recalculatePositions();
     } else {
+      const position = overPlayer.position!.position + (isBelowOverItem ? 1 : 0);
       this.removePlayer(activePlayer.id);
-      this.addPlayer(activePlayer, overTeam.index, overPlayer.position!.position);
+      this.addPlayer(activePlayer, overTeam.index, position);
     }
   }
 

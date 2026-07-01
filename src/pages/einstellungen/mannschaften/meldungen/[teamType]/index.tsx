@@ -23,6 +23,7 @@ import {
   DragOverEvent,
   DragOverlay,
   KeyboardSensor,
+  MeasuringStrategy,
   PointerSensor,
   rectIntersection,
   useSensor,
@@ -31,13 +32,14 @@ import {
 import {
   SortableContext,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { DragDropVerticalIcon, PlusSignIcon } from "hugeicons-react";
 import { XIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
+const noDisplacementStrategy = () => null;
 
 const PlayerPositionsPage = () => {
   const [teamCount, setTeamCount] = useState(0);
@@ -98,7 +100,8 @@ const PlayerPositionsPage = () => {
 
   const syncPlayersForType = useMemo(
     () =>
-      syncPlayersData.data?.find((t) => t.teamType === targetTeamType)?.players ?? [],
+      syncPlayersData.data?.find((t) => t.teamType === targetTeamType)
+        ?.players ?? [],
     [syncPlayersData.data, targetTeamType],
   );
   const isAutoImportDisabled = syncPlayersForType.length === 0;
@@ -107,23 +110,32 @@ const PlayerPositionsPage = () => {
     const existingPlayers = playerData.data?.players ?? [];
     const currentlyAssigned = targetPlayers ?? [];
 
-    const newPlayers: PlayerOfTeamDTO[] = syncPlayersForType.map((syncPlayer) => {
-      const existing = existingPlayers.find((p) => p.fullName === syncPlayer.name);
-      const id = existing?.id ?? crypto.randomUUID();
-      return {
-        id,
-        fullName: existing?.fullName ?? syncPlayer.name,
-        position: {
-          id: existing?.positions.find((pos) => pos.teamType === targetTeamType)?.id ?? crypto.randomUUID(),
-          playerId: id,
-          teamIndex: syncPlayer.teamIndex,
-          position: syncPlayer.position,
-          teamType: targetTeamType as TeamType,
-        },
-      };
-    });
+    const newPlayers: PlayerOfTeamDTO[] = syncPlayersForType.map(
+      (syncPlayer) => {
+        const existing = existingPlayers.find(
+          (p) => p.fullName === syncPlayer.name,
+        );
+        const id = existing?.id ?? crypto.randomUUID();
+        return {
+          id,
+          fullName: existing?.fullName ?? syncPlayer.name,
+          position: {
+            id:
+              existing?.positions.find((pos) => pos.teamType === targetTeamType)
+                ?.id ?? crypto.randomUUID(),
+            playerId: id,
+            teamIndex: syncPlayer.teamIndex,
+            position: syncPlayer.position,
+            teamType: targetTeamType as TeamType,
+          },
+        };
+      },
+    );
 
-    const maxIndex = Math.max(...newPlayers.map((p) => p.position?.teamIndex ?? 0), 0);
+    const maxIndex = Math.max(
+      ...newPlayers.map((p) => p.position?.teamIndex ?? 0),
+      0,
+    );
     setTeamCount(maxIndex);
     queryClient.setQueryData(["team-positions"], {
       teams: [
@@ -135,7 +147,12 @@ const PlayerPositionsPage = () => {
     // Mirror onRemovePlayer: strip targetTeamType positions from previously assigned players
     let updatedPlayers = existingPlayers.map((p) =>
       currentlyAssigned.some((a) => a.id === p.id)
-        ? { ...p, positions: p.positions.filter((pos) => pos.teamType !== targetTeamType) }
+        ? {
+            ...p,
+            positions: p.positions.filter(
+              (pos) => pos.teamType !== targetTeamType,
+            ),
+          }
         : p,
     );
 
@@ -146,12 +163,21 @@ const PlayerPositionsPage = () => {
         updatedPlayers[idx] = {
           ...updatedPlayers[idx],
           positions: [
-            ...updatedPlayers[idx].positions.filter((pos) => pos.teamType !== targetTeamType),
+            ...updatedPlayers[idx].positions.filter(
+              (pos) => pos.teamType !== targetTeamType,
+            ),
             newPlayer.position!,
           ],
         };
       } else {
-        updatedPlayers = [...updatedPlayers, { id: newPlayer.id, fullName: newPlayer.fullName, positions: [newPlayer.position!] }];
+        updatedPlayers = [
+          ...updatedPlayers,
+          {
+            id: newPlayer.id,
+            fullName: newPlayer.fullName,
+            positions: [newPlayer.position!],
+          },
+        ];
       }
     }
 
@@ -171,8 +197,20 @@ const PlayerPositionsPage = () => {
   const onDragOver = useCallback(
     (event: DragOverEvent) => {
       const { active, over } = event;
-      group.movePlayer({ activeId: active.id, overId: over?.id });
-      queryClient.setQueryData(["team-positions"], group.getStateValue(data?.teams || []));
+      const isBelowOverItem =
+        over !== null &&
+        active.rect.current.translated !== null &&
+        active.rect.current.translated.top >
+          over.rect.top + over.rect.height / 2;
+      group.movePlayer({
+        activeId: active.id,
+        overId: over?.id,
+        isBelowOverItem,
+      });
+      queryClient.setQueryData(
+        ["team-positions"],
+        group.getStateValue(data?.teams || []),
+      );
     },
     [group, data],
   );
@@ -180,7 +218,10 @@ const PlayerPositionsPage = () => {
   const onRemovePlayer = useCallback(
     (playerId: string) => {
       group.removePlayer(playerId);
-      queryClient.setQueryData(["team-positions"], group.getStateValue(data?.teams));
+      queryClient.setQueryData(
+        ["team-positions"],
+        group.getStateValue(data?.teams),
+      );
       const targetPlayer = playerData.data?.players.find(
         (player) => player.id === playerId,
       );
@@ -216,7 +257,11 @@ const PlayerPositionsPage = () => {
       }
       if (!playerData.data) return;
       group.removePlayer(player.id);
-      group.addPlayer(player, player.position.teamIndex, player.position.position);
+      group.addPlayer(
+        player,
+        player.position.teamIndex,
+        player.position.position,
+      );
 
       const playerDTO = {
         id: player.id,
@@ -224,7 +269,10 @@ const PlayerPositionsPage = () => {
         positions: [player.position],
       };
 
-      queryClient.setQueryData(["team-positions"], group.getStateValue(data?.teams));
+      queryClient.setQueryData(
+        ["team-positions"],
+        group.getStateValue(data?.teams),
+      );
       queryClient.setQueryData(["players"], {
         players: [
           ...playerData.data.players.filter((p) => p.id !== player.id),
@@ -295,19 +343,21 @@ const PlayerPositionsPage = () => {
         onDragCancel={() => setActiveId(null)}
         sensors={sensors}
         collisionDetection={rectIntersection}
+        measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
         onDragOver={onDragOver}
         autoScroll={false}
       >
         <SortableContext
           items={targetPlayers?.map((player) => player.id) || []}
           key={1}
-          strategy={verticalListSortingStrategy}
+          strategy={noDisplacementStrategy}
         >
           {groupedTeams.map((team, index) => {
             if (targetTeamType === "") return null;
             if (team.players.length === 0)
               return (
-                <div
+                <Droppable
+                  id={`team-${index + 1}`}
                   className="space-y-2 mt-6 border p-5 rounded-lg"
                   key={index}
                 >
@@ -315,13 +365,10 @@ const PlayerPositionsPage = () => {
                     {getTeamName(targetTeamType, index + 1)}
                   </p>
 
-                  <Droppable
-                    id={`team-${index + 1}`}
-                    className="p-2 border rounded-lg mt-4 text-muted-foreground flex items-center gap-1 bg-card"
-                  >
+                  <div className="p-2 border rounded-lg mt-4 text-muted-foreground flex items-center gap-1 bg-card">
                     <PlusSignIcon strokeWidth={2} className="size-5" />
                     Noch keine Spieler
-                  </Droppable>
+                  </div>
 
                   <AddPlayerDialog
                     onAddPlayer={onAddPlayer}
@@ -330,10 +377,14 @@ const PlayerPositionsPage = () => {
                     allPlayers={playerData?.data?.players || []}
                     targetTeamType={targetTeamType}
                   />
-                </div>
+                </Droppable>
               );
             return (
-              <div className="space-y-2 mt-6 border p-5 rounded-lg" key={index}>
+              <Droppable
+                id={`team-${index + 1}`}
+                className="space-y-2 mt-6 border p-5 rounded-lg"
+                key={index}
+              >
                 <h3 className="mb-4 font-medium">{team.teamName}</h3>
                 <div className="space-y-1.5">
                   {team.players.map((player, playerIndex) => (
@@ -379,7 +430,7 @@ const PlayerPositionsPage = () => {
                   allPlayers={playerData?.data?.players || []}
                   targetTeamType={targetTeamType}
                 />
-              </div>
+              </Droppable>
             );
           })}
           <Button
