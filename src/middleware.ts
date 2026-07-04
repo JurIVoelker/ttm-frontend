@@ -10,9 +10,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL(API_URL + path));
   }
 
-  if (path.startsWith("/ttc")) {
-    const newPath = path.replace("/ttc", "");
-    return NextResponse.redirect(new URL(newPath, request.url));
+  if (path === "/ttc" || path.startsWith("/ttc/")) {
+    const url = request.nextUrl.clone();
+    url.pathname = path.slice("/ttc".length) || "/";
+    return NextResponse.redirect(url);
   }
 
   if (path.startsWith("/not-found")) {
