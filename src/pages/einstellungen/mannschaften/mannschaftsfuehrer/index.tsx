@@ -1,5 +1,6 @@
 import AddLeaderModal from "@/components/add-leader-modal";
 import ConfirmDialog from "@/components/confirm-dialog";
+import EditLeaderModal from "@/components/edit-leader-modal";
 import Layout from "@/components/layout";
 import Title from "@/components/title";
 import { Button } from "@/components/ui/button";
@@ -16,10 +17,12 @@ import { showMessage } from "@/lib/message";
 import { queryClient } from "@/lib/query";
 import { cn } from "@/lib/utils";
 import { mainStore } from "@/store/main-store";
+import { LeaderDTO } from "@/types/leader";
 import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
 import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
+  PencilEdit02Icon,
   PlusSignIcon,
 } from "hugeicons-react";
 import { X } from "lucide-react";
@@ -41,6 +44,13 @@ const LeaderPage = () => {
 
   const onAddLeader = () => {
     leaderFetch.refetch();
+  };
+
+  const onEditLeader = (leader: LeaderDTO) => {
+    queryClient.setQueryData(
+      ["leaders"],
+      (leaderFetch.data || []).map((l) => (l.id === leader.id ? leader : l)),
+    );
   };
 
   const onRemoveLeader = async (leaderId: string, teamSlug: string) => {
@@ -119,22 +129,34 @@ const LeaderPage = () => {
                       key={leader.id}
                       className="w-full flex justify-between items-center"
                     >
-                      {leader.fullName}
-                      <ConfirmDialog
-                        title="Löschen"
-                        description="Möchstest du den Mannschaftsführer wirklich löschen?"
-                        onConfirm={() => onRemoveLeader(leader.id, team.slug)}
-                        open={openConfirmDialog === leader.id}
-                        setOpen={(open) =>
-                          setOpenConfirmDialog(open ? leader.id : null)
-                        }
-                      >
-                        <AlertDialogTrigger asChild>
-                          <Button variant="destructive" size="icon-sm">
-                            <X />
+                      <div className="min-w-0">
+                        <div className="translate-y-0.5 truncate">{leader.fullName}</div>
+                        <div className="text-sm text-muted-foreground -translate-y-px truncate">
+                          {leader.email}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 shrink-0 ml-2">
+                        <EditLeaderModal leader={leader} onEdit={onEditLeader}>
+                          <Button variant="outline" size="icon-sm">
+                            <PencilEdit02Icon strokeWidth={2} />
                           </Button>
-                        </AlertDialogTrigger>
-                      </ConfirmDialog>
+                        </EditLeaderModal>
+                        <ConfirmDialog
+                          title="Löschen"
+                          description="Möchstest du den Mannschaftsführer wirklich löschen?"
+                          onConfirm={() => onRemoveLeader(leader.id, team.slug)}
+                          open={openConfirmDialog === leader.id}
+                          setOpen={(open) =>
+                            setOpenConfirmDialog(open ? leader.id : null)
+                          }
+                        >
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="icon-sm">
+                              <X />
+                            </Button>
+                          </AlertDialogTrigger>
+                        </ConfirmDialog>
+                      </div>
                     </div>
                   ))}
                 <AddLeaderModal

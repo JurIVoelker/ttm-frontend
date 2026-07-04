@@ -1,5 +1,6 @@
 import AddAdminModal from "@/components/add-admin-modal";
 import ConfirmDialog from "@/components/confirm-dialog";
+import EditAdminModal from "@/components/edit-admin-modal";
 import Layout from "@/components/layout";
 import Title from "@/components/title";
 import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -9,7 +10,7 @@ import useFetchLeaders from "@/hooks/use-fetch/use-fetch-leaders";
 import { sendRequest } from "@/lib/fetch-utils";
 import { queryClient } from "@/lib/query";
 import { Admin } from "@/types/admin";
-import { ArrowLeft01Icon, PlusSignIcon } from "hugeicons-react";
+import { ArrowLeft01Icon, PencilEdit02Icon, PlusSignIcon } from "hugeicons-react";
 import { User2, X } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -26,6 +27,13 @@ const AdminsPage = () => {
 
   const onAdd = (admin: Admin) => {
     queryClient.setQueryData(["admins"], [...(admins || []), admin]);
+  };
+
+  const onEditAdmin = (admin: Admin) => {
+    queryClient.setQueryData(
+      ["admins"],
+      (admins || []).map((a) => (a.id === admin.id ? admin : a)),
+    );
   };
 
   const onRemoveAdmin = async (adminId: string) => {
@@ -61,30 +69,37 @@ const AdminsPage = () => {
             key={a.id}
             className="flex items-center justify-between border p-2 px-3 rounded-md"
           >
-            <div className="flex gap-2 items-center">
-              <div className="bg-secondary flex items-center justify-center rounded-full size-10">
+            <div className="flex gap-2 items-center min-w-0">
+              <div className="bg-secondary flex items-center justify-center rounded-full size-10 shrink-0">
                 <User2 className="text-primary size-5.5" />
               </div>
-              <div>
-                <div className="translate-y-0.5">{a.fullName}</div>
-                <div className="text-sm text-muted-foreground -translate-y-px">
+              <div className="min-w-0">
+                <div className="translate-y-0.5 truncate">{a.fullName}</div>
+                <div className="text-sm text-muted-foreground -translate-y-px truncate">
                   {a.email}
                 </div>
               </div>
             </div>
-            <ConfirmDialog
-              title="Löschen"
-              description="Möchstest du den Admin wirklich löschen?"
-              onConfirm={() => onRemoveAdmin(a.id)}
-              open={openConfirmDialog === a.id}
-              setOpen={(open) => setOpenConfirmDialog(open ? a.id : null)}
-            >
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="icon-sm">
-                  <X />
+            <div className="flex gap-2 shrink-0 ml-2">
+              <EditAdminModal admin={a} onEdit={onEditAdmin}>
+                <Button variant="outline" size="icon-sm">
+                  <PencilEdit02Icon strokeWidth={2} />
                 </Button>
-              </AlertDialogTrigger>
-            </ConfirmDialog>
+              </EditAdminModal>
+              <ConfirmDialog
+                title="Löschen"
+                description="Möchstest du den Admin wirklich löschen?"
+                onConfirm={() => onRemoveAdmin(a.id)}
+                open={openConfirmDialog === a.id}
+                setOpen={(open) => setOpenConfirmDialog(open ? a.id : null)}
+              >
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="icon-sm">
+                    <X />
+                  </Button>
+                </AlertDialogTrigger>
+              </ConfirmDialog>
+            </div>
           </div>
         ))}
 

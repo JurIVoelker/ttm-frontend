@@ -25,8 +25,7 @@ import { sendRequest } from "@/lib/fetch-utils";
 import { showMessage } from "@/lib/message";
 import { Admin } from "@/types/admin";
 import { track } from "@/lib/umami";
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { EMAIL_REGEX } from "@/lib/validation";
 
 type Suggestion = { id: string; fullName: string; email: string };
 

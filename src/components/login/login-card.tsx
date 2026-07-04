@@ -17,8 +17,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import useAuthStore from "@/hooks/use-auth-store";
 import { track } from "@/lib/umami";
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { EMAIL_REGEX } from "@/lib/validation";
 
 export default function LoginCard() {
   // State for form fields
