@@ -19,6 +19,38 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { track } from "@/lib/umami";
 
+type LineupErrorResponse = {
+  message?: string;
+  reason?: "PLAYER_NOT_FOUND" | "PLAYER_NOT_OF_TEAM_TYPE" | "PLAYER_FROM_HIGHER_TEAM";
+  player?: { id: string; fullName: string | null };
+  playerTeamIndex?: number | null;
+  matchTeamIndex?: number;
+};
+
+const getLineupErrorMessage = (
+  status: number,
+  data: LineupErrorResponse | null,
+) => {
+  const playerName = data?.player?.fullName || "Ein ausgewählter Spieler";
+
+  switch (data?.reason) {
+    case "PLAYER_FROM_HIGHER_TEAM":
+      return `${playerName} spielt in einer höheren Mannschaft und darf nicht in dieser Mannschaft aufgestellt werden.`;
+    case "PLAYER_NOT_OF_TEAM_TYPE":
+      return `${playerName} gehört nicht zu diesem Mannschaftstyp und darf nicht aufgestellt werden.`;
+    case "PLAYER_NOT_FOUND":
+      return "Ein ausgewählter Spieler existiert nicht mehr. Bitte lade die Seite neu.";
+  }
+
+  if (status === 403)
+    return "Du hast keine Berechtigung, diese Aktion durchzuführen.";
+  if (status === 401)
+    return "Authentifizierung fehlgeschlagen. Bitte versuche es erneut.";
+  if (status === 429)
+    return "Zu viele Anfragen in kurzer Zeit. Bitte warte einen Moment und versuche es erneut.";
+  return `Die Aufstellung konnte nicht gespeichert werden (${status}). Bitte versuche es erneut.`;
+};
+
 const LineupPage = () => {
   const matchId = usePathname()?.split("/")?.[3];
   const teamSlug = mainStore((state) => state.teamSlug);
@@ -75,6 +107,7 @@ const LineupPage = () => {
       path: `/api/match/${teamSlug}/lineup/${matchId}`,
       method: "POST",
       body: { playerIds: match.data?.lineup.map((p) => p.id) || [] },
+      options: { hideMessages: true },
     });
 
     if (res.ok) {
@@ -83,6 +116,12 @@ const LineupPage = () => {
       push(`/${teamSlug}#match-card-${matchId}`);
     } else {
       track("error:save-lineup");
+      const data = (await res
+        .json()
+        .catch(() => null)) as LineupErrorResponse | null;
+      showMessage(getLineupErrorMessage(res.status, data), {
+        variant: "error",
+      });
     }
     setLoading(false);
   };
