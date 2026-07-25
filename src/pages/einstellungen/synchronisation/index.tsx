@@ -13,6 +13,7 @@ import { showMessage } from "@/lib/message";
 import { queryClient } from "@/lib/query";
 import { TTApiMatch } from "@/types/sync";
 import {
+  CheckmarkCircle02Icon,
   DashboardCircleIcon,
   Settings01Icon,
   Tick01Icon,
@@ -191,6 +192,10 @@ const Synchronisation = () => {
     data.data?.unequalLocationMatches.length ||
     data.data?.unequalTimeMatches.length;
 
+  const hasNoOverviewMatches =
+    !data.data?.missingMatches.length &&
+    !isUpdateableMatchAvailable;
+
   return (
     <Layout>
       <Title>Synchronisation</Title>
@@ -219,6 +224,17 @@ const Synchronisation = () => {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="overview">
+          {data.isFetched && hasNoOverviewMatches && (
+            <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
+              <CheckmarkCircle02Icon
+                strokeWidth={2}
+                className="size-10 text-muted-foreground"
+              />
+              <p className="text-muted-foreground text-sm">
+                Alle Spiele sind synchronisiert
+              </p>
+            </div>
+          )}
           <div className="mt-6 space-y-2">
             {data.data?.missingMatches.length !== 0 && (
               <h2 className="text-lg font-medium">Neue Spiele</h2>
