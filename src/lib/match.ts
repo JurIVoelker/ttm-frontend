@@ -1,6 +1,6 @@
 import { MatchDTO } from "@/types/match";
 import { PlayerOfTeamDTO } from "@/types/player";
-import { format } from "date-fns";
+import { differenceInCalendarDays, format } from "date-fns";
 
 export const getWeekdayName = (date: Date) => {
   return new Intl.DateTimeFormat("de-DE", {
@@ -21,9 +21,9 @@ export const getInfoTextString = (
     return null;
   }
 
-  const daysUntilMatch = Math.ceil(
-    (new Date(match.time).getTime() - new Date().getTime()) /
-    (1000 * 60 * 60 * 24),
+  const daysUntilMatch = differenceInCalendarDays(
+    new Date(match.time),
+    new Date(),
   );
 
   const dateString = format(new Date(match.time), "dd.MM.yyyy");
@@ -46,7 +46,7 @@ export const getInfoTextString = (
     } statt. Wir spielen mit folgender Aufstellung: \n${match.lineup
       .map(
         (lineup, index) =>
-          ` - ${index + 1}. ${players.find((p) => p.id === lineup.id)?.fullName || "Unbekannt"}`,
+          ` - ${index + 1}. ${lineup.fullName || players.find((p) => p.id === lineup.id)?.fullName || "Unbekannt"}`,
       )
       .join("\n")}`;
 };
