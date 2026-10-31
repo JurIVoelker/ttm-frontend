@@ -21,7 +21,11 @@ import { track } from "@/lib/umami";
 
 type LineupErrorResponse = {
   message?: string;
-  reason?: "PLAYER_NOT_FOUND" | "PLAYER_NOT_OF_TEAM_TYPE" | "PLAYER_FROM_HIGHER_TEAM";
+  reason?:
+    | "PLAYER_NOT_FOUND"
+    | "PLAYER_NOT_OF_TEAM_TYPE"
+    | "PLAYER_FROM_HIGHER_TEAM"
+    | "PLAYER_NOT_MEMBER";
   player?: { id: string; fullName: string | null };
   playerTeamIndex?: number | null;
   matchTeamIndex?: number;
@@ -38,6 +42,8 @@ const getLineupErrorMessage = (
       return `${playerName} spielt in einer höheren Mannschaft und darf nicht in dieser Mannschaft aufgestellt werden.`;
     case "PLAYER_NOT_OF_TEAM_TYPE":
       return `${playerName} gehört nicht zu diesem Mannschaftstyp und darf nicht aufgestellt werden.`;
+    case "PLAYER_NOT_MEMBER":
+      return `${playerName} ist in dieser Mannschaft gemeldet, aber kein Mitglied. Füge den Spieler zuerst der Mannschaft hinzu.`;
     case "PLAYER_NOT_FOUND":
       return "Ein ausgewählter Spieler existiert nicht mehr. Bitte lade die Seite neu.";
   }

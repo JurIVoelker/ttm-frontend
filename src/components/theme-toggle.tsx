@@ -3,16 +3,22 @@
 import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
 
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { track } from "@/lib/umami";
 import { SidebarMenuButton } from "./ui/sidebar";
 
 export type Theme = "light" | "dark" | "system";
 
 export default function ThemeToggle() {
-  const { setTheme, theme } = useTheme() as {
+  const { setTheme, theme: storedTheme } = useTheme() as {
     setTheme: (theme: Theme) => void;
     theme: Theme;
   };
+  // The theme is only known on the client; render the server state until mounted
+  // so the first client render matches the server HTML.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const theme = mounted ? storedTheme : undefined;
 
   const toggleTheme = () => {
     if (theme === "dark") {

@@ -41,6 +41,9 @@ export const authStore = create<Store>()(
     }),
     {
       name: "auth-storage",
+      // The server has no localStorage, so the first client render must be logged out
+      // too (hydration). _app rehydrates in a layout effect right after hydration.
+      skipHydration: true,
       partialize: (state) => ({
         jwt: state.jwt,
         inviteToken: state.inviteToken,

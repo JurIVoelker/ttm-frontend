@@ -17,6 +17,7 @@ import {
   Login02Icon,
   Notification01Icon,
   Settings01Icon,
+  SparklesIcon,
   UserCircleIcon,
 } from "hugeicons-react";
 import { isAdmin, isLeader, isPlayer } from "@/lib/permission";
@@ -113,6 +114,12 @@ const AppSidebar = () => {
                 Logout
               </SidebarMenuButton>
             </ConfirmDialog>
+          )}
+          {previlegedRole && (
+            <SidebarMenuButton onClick={() => navigate("/assistent")}>
+              <SparklesIcon strokeWidth={2} />
+              KI Assistent
+            </SidebarMenuButton>
           )}
           {!previlegedRole && (
             <SidebarMenuButton onClick={() => navigate("/login")}>

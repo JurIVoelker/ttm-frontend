@@ -10,6 +10,7 @@ const Refresher = () => {
     const splitPath = pathName.split("/");
     if (splitPath.length <= 1) return;
     const newSlug = splitPath[1];
+    // Top-level pages that are not teams (see src/pages)
     const forbiddenSlugs = [
       "admins",
       "synchronisation",
@@ -18,6 +19,11 @@ const Refresher = () => {
       "benachrichtigungen",
       "einstellungen",
       "info",
+      "assistent",
+      "registrieren",
+      "passwort-vergessen",
+      "passwort-reset",
+      "not-found",
     ];
     if (forbiddenSlugs.includes(newSlug)) {
       mainStore.getState().setTeamSlug(null);

@@ -15,7 +15,8 @@ export const metadata: Metadata = {
 
 export default function Document() {
   return (
-    <Html lang="de">
+    // next-themes sets the theme class on <html> before hydration
+    <Html lang="de" suppressHydrationWarning>
       <Head>
         <link rel="manifest" href="/manifest.json" />
         {process.env.NEXT_PUBLIC_UMAMI_ENV !== "prod" ? (
